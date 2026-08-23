@@ -8,6 +8,8 @@ export interface ChatRequest {
   messages: ChatMessage[];
   temperature?: number;
   maxTokens?: number;
+  // lets the caller cancel the upstream call when the client goes away
+  signal?: AbortSignal;
 }
 
 export interface TokenUsage {

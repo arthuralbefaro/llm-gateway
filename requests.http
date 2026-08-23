@@ -1,0 +1,115 @@
+@host = http://localhost:3000
+@apiKey = replace-with-the-key-printed-by-the-seed
+
+### non streaming
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    { "role": "system", "content": "You answer in one short sentence." },
+    { "role": "user", "content": "What is the capital of France?" }
+  ]
+}
+
+### streaming
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    { "role": "user", "content": "Count from one to ten, one number per line." }
+  ],
+  "stream": true
+}
+
+### streaming on anthropic
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "claude-haiku-4-5",
+  "messages": [
+    { "role": "user", "content": "Count from one to ten, one number per line." }
+  ],
+  "stream": true
+}
+
+### semantically equivalent prompt, should be a cache hit
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    { "role": "system", "content": "You answer in one short sentence." },
+    { "role": "user", "content": "Which city is the capital of France?" }
+  ]
+}
+
+### temperature above zero, should bypass the cache
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    { "role": "user", "content": "Give me a random colour." }
+  ],
+  "temperature": 0.9
+}
+
+### unsupported model, expects 400
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "llama-3-70b",
+  "messages": [{ "role": "user", "content": "hello" }]
+}
+
+### empty messages, expects 400
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "gpt-4o-mini",
+  "messages": []
+}
+
+### invalid role, expects 400
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "gpt-4o-mini",
+  "messages": [{ "role": "root", "content": "hello" }]
+}
+
+### missing model, expects 400
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "messages": [{ "role": "user", "content": "hello" }]
+}
+
+### no Authorization header, expects 401
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+
+{
+  "model": "gpt-4o-mini",
+  "messages": [{ "role": "user", "content": "hello" }]
+}

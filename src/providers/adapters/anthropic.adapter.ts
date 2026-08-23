@@ -73,14 +73,17 @@ export class AnthropicAdapter extends LlmProvider {
     const { system, messages } = this.split(req.messages);
 
     try {
-      const message = await this.client.messages.create({
-        model: req.model,
-        messages,
-        system,
-        temperature: req.temperature,
-        max_tokens: req.maxTokens ?? DEFAULT_MAX_TOKENS,
-        stream: false,
-      });
+      const message = await this.client.messages.create(
+        {
+          model: req.model,
+          messages,
+          system,
+          temperature: req.temperature,
+          max_tokens: req.maxTokens ?? DEFAULT_MAX_TOKENS,
+          stream: false,
+        },
+        { signal: req.signal },
+      );
 
       const content = message.content
         .map((block) => (block.type === 'text' ? block.text : ''))
@@ -106,14 +109,17 @@ export class AnthropicAdapter extends LlmProvider {
     let completionTokens = 0;
 
     try {
-      const stream = await this.client.messages.create({
-        model: req.model,
-        messages,
-        system,
-        temperature: req.temperature,
-        max_tokens: req.maxTokens ?? DEFAULT_MAX_TOKENS,
-        stream: true,
-      });
+      const stream = await this.client.messages.create(
+        {
+          model: req.model,
+          messages,
+          system,
+          temperature: req.temperature,
+          max_tokens: req.maxTokens ?? DEFAULT_MAX_TOKENS,
+          stream: true,
+        },
+        { signal: req.signal },
+      );
 
       for await (const event of stream) {
         switch (event.type) {

@@ -56,13 +56,16 @@ export class OpenAiAdapter extends LlmProvider {
 
   async chat(req: ChatRequest): Promise<ChatResult> {
     try {
-      const completion = await this.client.chat.completions.create({
-        model: req.model,
-        messages: this.toMessages(req.messages),
-        temperature: req.temperature,
-        max_completion_tokens: req.maxTokens,
-        stream: false,
-      });
+      const completion = await this.client.chat.completions.create(
+        {
+          model: req.model,
+          messages: this.toMessages(req.messages),
+          temperature: req.temperature,
+          max_completion_tokens: req.maxTokens,
+          stream: false,
+        },
+        { signal: req.signal },
+      );
 
       return {
         content: completion.choices[0]?.message.content ?? '',
@@ -79,15 +82,18 @@ export class OpenAiAdapter extends LlmProvider {
     let usage: TokenUsage = { promptTokens: 0, completionTokens: 0 };
 
     try {
-      const stream = await this.client.chat.completions.create({
-        model: req.model,
-        messages: this.toMessages(req.messages),
-        temperature: req.temperature,
-        max_completion_tokens: req.maxTokens,
-        stream: true,
-        // without this the stream carries no usage and the request has no cost
-        stream_options: { include_usage: true },
-      });
+      const stream = await this.client.chat.completions.create(
+        {
+          model: req.model,
+          messages: this.toMessages(req.messages),
+          temperature: req.temperature,
+          max_completion_tokens: req.maxTokens,
+          stream: true,
+          // without this the stream carries no usage and the request has no cost
+          stream_options: { include_usage: true },
+        },
+        { signal: req.signal },
+      );
 
       for await (const chunk of stream) {
         if (chunk.usage) {
