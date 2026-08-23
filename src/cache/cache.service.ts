@@ -7,7 +7,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import { ChatRequest } from '../providers/provider.types';
 import { EmbeddingService } from './embedding.service';
 
-const DEFAULT_THRESHOLD = 0.92;
+// see docs/adr/0001, below this a translation scores as a paraphrase
+const DEFAULT_THRESHOLD = 0.95;
 const DEFAULT_TTL_SECONDS = 60 * 60 * 24;
 
 export type CacheHitKind = 'exact' | 'semantic';
@@ -22,6 +23,11 @@ interface NeighbourRow {
   id: string;
   response: string;
   similarity: number;
+}
+
+interface ExactEntry {
+  id: string;
+  response: string;
 }
 
 @Injectable()
@@ -79,9 +85,14 @@ export class CacheService implements OnModuleDestroy {
     const prompt = normalize(req);
 
     try {
-      const exact = await this.redis.get(redisKey(req.model, prompt));
-      if (exact !== null) {
-        return { response: exact, kind: 'exact', similarity: 1 };
+      const cached = parseExact(
+        await this.redis.get(redisKey(req.model, prompt)),
+      );
+      if (cached) {
+        // counted in the background, the exact path exists to avoid touching
+        // postgres and must not start waiting on it now
+        void this.countHit(cached.id);
+        return { response: cached.response, kind: 'exact', similarity: 1 };
       }
     } catch (error) {
       this.logger.warn(`exact lookup skipped: ${describe(error)}`);
@@ -106,18 +117,18 @@ export class CacheService implements OnModuleDestroy {
 
     try {
       const embedding = await this.embeddings.embed(prompt);
-      await this.prisma.$executeRaw(Prisma.sql`
+      const rows = await this.prisma.$queryRaw<{ id: string }[]>(Prisma.sql`
         INSERT INTO "CacheEntry" ("id", "promptHash", "prompt", "response", "model", "embedding", "lastUsedAt")
         VALUES (gen_random_uuid()::text, ${hash}, ${prompt}, ${response}, ${req.model}, ${toVector(embedding)}::vector, now())
         ON CONFLICT ("promptHash") DO UPDATE
           SET "response" = EXCLUDED."response", "lastUsedAt" = now()
+        RETURNING "id"
       `);
-      await this.redis.set(
-        redisKey(req.model, prompt),
-        response,
-        'EX',
-        this.ttlSeconds,
-      );
+
+      const id = rows.at(0)?.id;
+      if (id) {
+        await this.setExact(req.model, prompt, id, response);
+      }
     } catch (error) {
       this.logger.warn(`cache store skipped: ${describe(error)}`);
     }
@@ -153,18 +164,42 @@ export class CacheService implements OnModuleDestroy {
       WHERE "id" = ${nearest.id}
     `);
 
-    await this.redis.set(
-      redisKey(model, prompt),
-      nearest.response,
-      'EX',
-      this.ttlSeconds,
-    );
+    await this.setExact(model, prompt, nearest.id, nearest.response);
 
     return {
       response: nearest.response,
       kind: 'semantic',
       similarity: nearest.similarity,
     };
+  }
+
+  private async countHit(id: string): Promise<void> {
+    try {
+      await this.prisma.$executeRaw(Prisma.sql`
+        UPDATE "CacheEntry"
+        SET "hits" = "hits" + 1, "lastUsedAt" = now()
+        WHERE "id" = ${id}
+      `);
+    } catch (error) {
+      this.logger.warn(`hit counter skipped: ${describe(error)}`);
+    }
+  }
+
+  // the entry id travels with the response because a semantic hit stores this
+  // prompt's key pointing at another prompt's row, and the counter needs the row
+  private setExact(
+    model: string,
+    prompt: string,
+    id: string,
+    response: string,
+  ): Promise<string> {
+    const payload: ExactEntry = { id, response };
+    return this.redis.set(
+      redisKey(model, prompt),
+      JSON.stringify(payload),
+      'EX',
+      this.ttlSeconds,
+    );
   }
 }
 
@@ -187,6 +222,30 @@ function normalize(req: ChatRequest): string {
     .replace(/\s+/g, ' ')
     .trim()
     .toLowerCase();
+}
+
+// an entry written before the payload gained its id reads back as a miss, which
+// costs one lookup and never a crash
+function parseExact(raw: string | null): ExactEntry | undefined {
+  if (raw === null) {
+    return undefined;
+  }
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (
+      typeof parsed === 'object' &&
+      parsed !== null &&
+      'id' in parsed &&
+      'response' in parsed &&
+      typeof parsed.id === 'string' &&
+      typeof parsed.response === 'string'
+    ) {
+      return { id: parsed.id, response: parsed.response };
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
 }
 
 function toVector(embedding: number[]): string {
