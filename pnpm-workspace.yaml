@@ -1,4 +1,7 @@
 allowBuilds:
   '@prisma/engines': false
+  onnxruntime-node: false
   prisma: false
+  protobufjs: false
+  sharp: false
   unrs-resolver: true

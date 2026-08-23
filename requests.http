@@ -1,16 +1,63 @@
 @host = http://localhost:3000
 @apiKey = replace-with-the-key-printed-by-the-seed
 
-### non streaming
+### non streaming, local provider, no api key needed
 POST {{host}}/v1/chat/completions
 Content-Type: application/json
 Authorization: Bearer {{apiKey}}
 
 {
-  "model": "gpt-4o-mini",
+  "model": "local-small",
   "messages": [
-    { "role": "system", "content": "You answer in one short sentence." },
     { "role": "user", "content": "What is the capital of France?" }
+  ]
+}
+
+### same request again, served from the exact cache
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "local-small",
+  "messages": [
+    { "role": "user", "content": "What is the capital of France?" }
+  ]
+}
+
+### rewritten prompt, same meaning, served from the semantic cache
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "local-small",
+  "messages": [
+    { "role": "user", "content": "Which city is the capital of France?" }
+  ]
+}
+
+### the same question in Portuguese, a separate cache entry on purpose
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "local-small",
+  "messages": [
+    { "role": "user", "content": "Qual é a capital da França?" }
+  ]
+}
+
+### rewritten Portuguese prompt, served from the semantic cache
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "local-small",
+  "messages": [
+    { "role": "user", "content": "Que cidade é a capital da França?" }
   ]
 }
 
@@ -20,14 +67,39 @@ Content-Type: application/json
 Authorization: Bearer {{apiKey}}
 
 {
-  "model": "gpt-4o-mini",
+  "model": "local-small",
   "messages": [
-    { "role": "user", "content": "Count from one to ten, one number per line." }
+    { "role": "user", "content": "Name three colours" }
   ],
   "stream": true
 }
 
-### streaming on anthropic
+### temperature above zero bypasses the cache, the caller asked for variation
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "local-small",
+  "messages": [
+    { "role": "user", "content": "Give me a random colour." }
+  ],
+  "temperature": 0.9
+}
+
+### openai, only routable when OPENAI_API_KEY is set
+POST {{host}}/v1/chat/completions
+Content-Type: application/json
+Authorization: Bearer {{apiKey}}
+
+{
+  "model": "gpt-4o-mini",
+  "messages": [
+    { "role": "user", "content": "What is the capital of France?" }
+  ]
+}
+
+### anthropic, only routable when ANTHROPIC_API_KEY is set
 POST {{host}}/v1/chat/completions
 Content-Type: application/json
 Authorization: Bearer {{apiKey}}
@@ -35,35 +107,9 @@ Authorization: Bearer {{apiKey}}
 {
   "model": "claude-haiku-4-5",
   "messages": [
-    { "role": "user", "content": "Count from one to ten, one number per line." }
+    { "role": "user", "content": "What is the capital of France?" }
   ],
   "stream": true
-}
-
-### semantically equivalent prompt, should be a cache hit
-POST {{host}}/v1/chat/completions
-Content-Type: application/json
-Authorization: Bearer {{apiKey}}
-
-{
-  "model": "gpt-4o-mini",
-  "messages": [
-    { "role": "system", "content": "You answer in one short sentence." },
-    { "role": "user", "content": "Which city is the capital of France?" }
-  ]
-}
-
-### temperature above zero, should bypass the cache
-POST {{host}}/v1/chat/completions
-Content-Type: application/json
-Authorization: Bearer {{apiKey}}
-
-{
-  "model": "gpt-4o-mini",
-  "messages": [
-    { "role": "user", "content": "Give me a random colour." }
-  ],
-  "temperature": 0.9
 }
 
 ### unsupported model, expects 400
@@ -82,7 +128,7 @@ Content-Type: application/json
 Authorization: Bearer {{apiKey}}
 
 {
-  "model": "gpt-4o-mini",
+  "model": "local-small",
   "messages": []
 }
 
@@ -92,7 +138,7 @@ Content-Type: application/json
 Authorization: Bearer {{apiKey}}
 
 {
-  "model": "gpt-4o-mini",
+  "model": "local-small",
   "messages": [{ "role": "root", "content": "hello" }]
 }
 
@@ -110,6 +156,6 @@ POST {{host}}/v1/chat/completions
 Content-Type: application/json
 
 {
-  "model": "gpt-4o-mini",
+  "model": "local-small",
   "messages": [{ "role": "user", "content": "hello" }]
 }

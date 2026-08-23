@@ -41,7 +41,7 @@ model CacheEntry {
   prompt     String
   response   String
   model      String
-  embedding  Unsupported("vector(1536)")
+  embedding  Unsupported("vector(384)")
   hits       Int                          @default(0)
   createdAt  DateTime                     @default(now())
   lastUsedAt DateTime                     @updatedAt

@@ -14,6 +14,7 @@ import { RouterService } from '../router/router.service';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import type { AuthenticatedRequest } from '../common/guards/api-key.guard';
 import { RequestLogService } from '../metrics/request-log.service';
+import { CacheService } from '../cache/cache.service';
 import type { RequestRecord } from '../metrics/request-log.service';
 import { GatewayController } from './gateway.controller';
 
@@ -106,6 +107,14 @@ describe('GatewayController', () => {
       recorded.push(entry);
     },
   };
+  const stored: string[] = [];
+  const cache = {
+    lookup: () => Promise.resolve(undefined),
+    store: (_req: unknown, response: string) => {
+      stored.push(response);
+      return Promise.resolve();
+    },
+  };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -114,6 +123,7 @@ describe('GatewayController', () => {
         RouterService,
         { provide: LLM_PROVIDERS, useValue: [stub] },
         { provide: RequestLogService, useValue: requestLog },
+        { provide: CacheService, useValue: cache },
       ],
     })
       .overrideGuard(ApiKeyGuard)
@@ -136,6 +146,7 @@ describe('GatewayController', () => {
 
   beforeEach(() => {
     recorded.length = 0;
+    stored.length = 0;
   });
 
   it('returns json when stream is false', async () => {

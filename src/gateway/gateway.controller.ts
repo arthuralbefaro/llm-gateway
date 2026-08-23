@@ -1,5 +1,6 @@
 import { Body, Controller, Logger, Post, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
+import { CacheService } from '../cache/cache.service';
 import { ApiKeyId } from '../common/decorators/api-key-id.decorator';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
@@ -14,6 +15,7 @@ import { RouterService } from '../router/router.service';
 import { chatCompletionSchema } from './dto/chat-completion.schema';
 import type { ChatCompletionBody } from './dto/chat-completion.schema';
 import {
+  chunkText,
   completionId,
   completionPayload,
   openSseStream,
@@ -25,6 +27,10 @@ import {
 
 const NO_USAGE: TokenUsage = { promptTokens: 0, completionTokens: 0 };
 
+// a hit spends nothing upstream, so it is recorded against the cache rather
+// than against whichever provider first produced the answer
+const CACHE_PROVIDER = 'cache';
+
 @Controller('v1/chat')
 @UseGuards(ApiKeyGuard)
 export class GatewayController {
@@ -32,6 +38,7 @@ export class GatewayController {
 
   constructor(
     private readonly router: RouterService,
+    private readonly cache: CacheService,
     private readonly requestLog: RequestLogService,
   ) {}
 
@@ -49,9 +56,30 @@ export class GatewayController {
       return;
     }
 
+    const req = this.toChatRequest(body);
     const startedAt = Date.now();
+
     try {
-      const routed = await this.router.chat(this.toChatRequest(body));
+      const hit = await this.cache.lookup(req);
+      if (hit) {
+        this.logCacheHit(hit.kind, body.model, hit.similarity);
+        this.recordHit(apiKeyId, body.model, Date.now() - startedAt);
+        res.json(
+          completionPayload(
+            completionId(),
+            {
+              content: hit.response,
+              usage: NO_USAGE,
+              model: body.model,
+              provider: CACHE_PROVIDER,
+            },
+            true,
+          ),
+        );
+        return;
+      }
+
+      const routed = await this.router.chat(req);
 
       this.requestLog.record({
         apiKeyId,
@@ -63,6 +91,9 @@ export class GatewayController {
         cacheHit: false,
         status: 'success',
       });
+
+      // storing must not delay the answer the caller is already waiting for
+      void this.cache.store(req, routed.result.content);
 
       res.json(completionPayload(completionId(), routed.result, false));
     } catch (error) {
@@ -88,23 +119,41 @@ export class GatewayController {
     // resolve before any byte is written, so an unsupported model is still a 400
     this.router.resolve(body.model);
 
+    const req = { ...this.toChatRequest(body), signal: abort.signal };
     const startedAt = Date.now();
     const id = completionId();
-    const stream = this.router.stream(
-      { ...this.toChatRequest(body), signal: abort.signal },
-      (outcome) => {
-        this.requestLog.record({
-          apiKeyId,
-          provider: outcome.provider,
-          model: outcome.model,
-          usage: outcome.usage,
-          costUsd: outcome.costUsd,
-          latencyMs: outcome.latencyMs,
-          cacheHit: false,
-          status: 'success',
-        });
-      },
-    );
+
+    const hit = await this.cache.lookup(req);
+    if (hit) {
+      this.logCacheHit(hit.kind, body.model, hit.similarity);
+      this.recordHit(apiKeyId, body.model, Date.now() - startedAt);
+      openSseStream(res);
+      for (const piece of chunkText(hit.response)) {
+        if (abort.signal.aborted) {
+          res.end();
+          return;
+        }
+        writeDelta(res, id, body.model, piece);
+      }
+      writeFinal(res, id, body.model, NO_USAGE, true);
+      writeDone(res);
+      res.end();
+      return;
+    }
+
+    let content = '';
+    const stream = this.router.stream(req, (outcome) => {
+      this.requestLog.record({
+        apiKeyId,
+        provider: outcome.provider,
+        model: outcome.model,
+        usage: outcome.usage,
+        costUsd: outcome.costUsd,
+        latencyMs: outcome.latencyMs,
+        cacheHit: false,
+        status: 'success',
+      });
+    });
     const iterator = stream[Symbol.asyncIterator]();
 
     // the first chunk is pulled before any header goes out, which keeps an
@@ -129,6 +178,7 @@ export class GatewayController {
         if (chunk.done) {
           writeFinal(res, id, body.model, chunk.usage ?? NO_USAGE, false);
         } else if (chunk.delta) {
+          content += chunk.delta;
           writeDelta(res, id, body.model, chunk.delta);
         }
         if (abort.signal.aborted) {
@@ -149,8 +199,32 @@ export class GatewayController {
       return;
     }
 
+    // a partial answer must not be stored as if it were the whole thing
+    if (!abort.signal.aborted && content.length > 0) {
+      void this.cache.store(req, content);
+    }
+
     writeDone(res);
     res.end();
+  }
+
+  private logCacheHit(kind: string, model: string, similarity: number): void {
+    this.logger.log(
+      `${kind} cache hit for ${model} at similarity ${similarity.toFixed(4)}`,
+    );
+  }
+
+  private recordHit(apiKeyId: string, model: string, latencyMs: number): void {
+    this.requestLog.record({
+      apiKeyId,
+      provider: CACHE_PROVIDER,
+      model,
+      usage: NO_USAGE,
+      costUsd: 0,
+      latencyMs,
+      cacheHit: true,
+      status: 'success',
+    });
   }
 
   private recordFailure(

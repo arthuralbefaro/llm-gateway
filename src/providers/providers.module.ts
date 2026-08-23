@@ -1,6 +1,7 @@
 import { Logger, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AnthropicAdapter } from './adapters/anthropic.adapter';
+import { LocalAdapter } from './adapters/local.adapter';
 import { OpenAiAdapter } from './adapters/openai.adapter';
 import { LlmProvider } from './llm-provider.abstract';
 
@@ -8,11 +9,16 @@ export const LLM_PROVIDERS = Symbol('LLM_PROVIDERS');
 
 interface ProviderCandidate {
   name: string;
-  envKey: string;
+  // undefined means the provider needs no credential and is always registered
+  envKey?: string;
   create: (config: ConfigService) => LlmProvider;
 }
 
 const CANDIDATES: ProviderCandidate[] = [
+  {
+    name: 'local',
+    create: (config) => new LocalAdapter(config),
+  },
   {
     name: 'openai',
     envKey: 'OPENAI_API_KEY',
@@ -33,8 +39,10 @@ function createProviders(config: ConfigService): LlmProvider[] {
 
   for (const candidate of CANDIDATES) {
     // an absent key and an empty one are equally unusable
-    const apiKey = config.get<string>(candidate.envKey);
-    if (!apiKey) {
+    const apiKey = candidate.envKey
+      ? config.get<string>(candidate.envKey)
+      : undefined;
+    if (candidate.envKey && !apiKey) {
       logger.warn(
         `${candidate.name} not registered, ${candidate.envKey} is missing or empty`,
       );

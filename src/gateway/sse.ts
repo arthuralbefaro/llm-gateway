@@ -37,6 +37,12 @@ export function completionPayload(
   };
 }
 
+// a cached reply is replayed piece by piece so a client cannot tell a hit
+// from a miss by the shape of the stream
+export function chunkText(text: string): string[] {
+  return text.split(/(?<=\s)/).filter((piece) => piece.length > 0);
+}
+
 export function openSseStream(res: Response): void {
   res.status(200);
   res.setHeader('Content-Type', 'text/event-stream; charset=utf-8');
