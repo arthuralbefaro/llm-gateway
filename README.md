@@ -32,7 +32,7 @@ $ pnpm install
 $ docker compose up -d
 ```
 
-> **Portas não-padrão:** o Postgres sobe em `5433` e o Redis em `6380` para não conflitar com instalações nativas de Postgres/Redis na máquina, que sequestram `5432`/`6379` e fazem a aplicação falar com o servidor errado.
+> **Non-default ports:** Postgres listens on `5433` and Redis on `6380` so they do not collide with native Postgres/Redis installations, which hijack `5432`/`6379` and make the application talk to the wrong server.
 
 ## Compile and run the project
 
