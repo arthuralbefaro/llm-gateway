@@ -1,0 +1,1 @@
+CREATE INDEX cache_embedding_idx ON "CacheEntry" USING hnsw (embedding vector_cosine_ops);

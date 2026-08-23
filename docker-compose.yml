@@ -1,0 +1,23 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: gateway
+      POSTGRES_PASSWORD: gateway
+      POSTGRES_DB: gateway
+    ports: ['5433:5432']
+    volumes: ['pgdata:/var/lib/postgresql/data']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U gateway']
+      interval: 5s
+      retries: 10
+  
+  redis:
+    image: redis:7-alpine
+    ports: ['6380:6379']
+    command: redis-server --appendonly yes
+    volumes: ['redisdata:/data']
+
+volumes:
+  pgdata:
+  redisdata:

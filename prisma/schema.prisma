@@ -1,0 +1,47 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+}
+
+datasource db {
+  provider   = "postgresql"
+}
+
+model ApiKey {
+  id        String    @id @default(uuid())
+  name      String
+  hash      String    @unique
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  requests  Request[]
+}
+
+model Request {
+  id              String   @id @default(uuid())
+  apiKeyId        String
+  apiKey          ApiKey   @relation(fields: [apiKeyId], references: [id])
+  provider        String
+  model           String
+  promptTokens    Int      @default(0)
+  completionTokens Int     @default(0)
+  costUsd         Decimal  @default(0) @db.Decimal(12, 8)
+  latencyMs       Int
+  cacheHit        Boolean  @default(false)
+  status          String
+  createdAt       DateTime @default(now())
+
+  @@index([apiKeyId, createdAt])
+  @@index([createdAt])
+}
+
+model CacheEntry {
+  id         String                       @id @default(uuid())
+  promptHash String                       @unique
+  prompt     String
+  response   String
+  model      String
+  embedding  Unsupported("vector(1536)")
+  hits       Int                          @default(0)
+  createdAt  DateTime                     @default(now())
+  lastUsedAt DateTime                     @updatedAt
+}
