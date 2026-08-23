@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { ExecutionContext, INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import http, { Server } from 'node:http';
@@ -11,7 +11,26 @@ import {
   TokenUsage,
 } from '../providers/provider.types';
 import { RouterService } from '../router/router.service';
+import { ApiKeyGuard } from '../common/guards/api-key.guard';
+import type { AuthenticatedRequest } from '../common/guards/api-key.guard';
+import { RequestLogService } from '../metrics/request-log.service';
+import type { RequestRecord } from '../metrics/request-log.service';
 import { GatewayController } from './gateway.controller';
+
+// resolves early on abort so jest does not exit with a pending timer
+function sleep(ms: number, signal: AbortSignal | undefined): Promise<void> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(resolve, ms);
+    signal?.addEventListener(
+      'abort',
+      () => {
+        clearTimeout(timer);
+        resolve();
+      },
+      { once: true },
+    );
+  });
+}
 
 class StubProvider extends LlmProvider {
   readonly name = 'stub';
@@ -36,7 +55,7 @@ class StubProvider extends LlmProvider {
     yield { delta: 'Hello', done: false };
     if (this.slow) {
       for (let i = 0; i < 50; i += 1) {
-        await new Promise((resolve) => setTimeout(resolve, 40));
+        await sleep(40, req.signal);
         if (req.signal?.aborted) {
           return;
         }
@@ -81,12 +100,31 @@ function listeningPort(server: Server): number {
 describe('GatewayController', () => {
   let app: INestApplication;
   const stub = new StubProvider();
+  const recorded: RequestRecord[] = [];
+  const requestLog = {
+    record: (entry: RequestRecord) => {
+      recorded.push(entry);
+    },
+  };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [GatewayController],
-      providers: [RouterService, { provide: LLM_PROVIDERS, useValue: [stub] }],
-    }).compile();
+      providers: [
+        RouterService,
+        { provide: LLM_PROVIDERS, useValue: [stub] },
+        { provide: RequestLogService, useValue: requestLog },
+      ],
+    })
+      .overrideGuard(ApiKeyGuard)
+      .useValue({
+        canActivate: (context: ExecutionContext) => {
+          context.switchToHttp().getRequest<AuthenticatedRequest>().apiKeyId =
+            'test-api-key';
+          return true;
+        },
+      })
+      .compile();
 
     app = module.createNestApplication();
     await app.init();
@@ -94,6 +132,10 @@ describe('GatewayController', () => {
 
   afterAll(async () => {
     await app.close();
+  });
+
+  beforeEach(() => {
+    recorded.length = 0;
   });
 
   it('returns json when stream is false', async () => {
@@ -113,6 +155,17 @@ describe('GatewayController', () => {
       choices: [{ message: { role: 'assistant', content: 'Hello there' } }],
       usage: { prompt_tokens: 3, completion_tokens: 2, total_tokens: 5 },
     });
+
+    expect(recorded).toHaveLength(1);
+    expect(recorded[0]).toMatchObject({
+      apiKeyId: 'test-api-key',
+      provider: 'stub',
+      model: 'stub-model',
+      cacheHit: false,
+      status: 'success',
+      usage: { promptTokens: 3, completionTokens: 2 },
+    });
+    expect(recorded[0].latencyMs).toBeGreaterThanOrEqual(0);
   });
 
   it('streams one sse event per chunk and terminates with [DONE]', async () => {
@@ -149,6 +202,14 @@ describe('GatewayController', () => {
     };
     expect(last.choices[0].finish_reason).toBe('stop');
     expect(last.usage.total_tokens).toBe(5);
+
+    // the usage only exists after the final chunk, so the row is written then
+    expect(recorded).toHaveLength(1);
+    expect(recorded[0]).toMatchObject({
+      status: 'success',
+      cacheHit: false,
+      usage: { promptTokens: 3, completionTokens: 2 },
+    });
   });
 
   it('aborts the upstream stream when the client disconnects', async () => {
