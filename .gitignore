@@ -62,3 +62,5 @@ src/generated
 
 # local model cache for the embedding service
 .models
+
+docs/
