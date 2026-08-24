@@ -20,6 +20,17 @@ const CANDIDATES: ProviderCandidate[] = [
     create: (config) => new LocalAdapter(config),
   },
   {
+    name: 'local-backup',
+    // opt in, because a second copy of the same provider is only useful for
+    // exercising fallback and the breaker
+    envKey: 'LOCAL_BACKUP_ENABLED',
+    create: (config) =>
+      new LocalAdapter(config, {
+        name: 'local-backup',
+        envPrefix: 'LOCAL_BACKUP',
+      }),
+  },
+  {
     name: 'openai',
     envKey: 'OPENAI_API_KEY',
     create: (config) => new OpenAiAdapter(config),

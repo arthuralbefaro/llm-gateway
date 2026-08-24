@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { TokenUsage } from '../providers/provider.types';
+import { AttemptRecord } from '../router/router.service';
 
 export type RequestStatus = 'success' | 'error';
 
@@ -13,7 +14,12 @@ export interface RequestRecord {
   latencyMs: number;
   cacheHit: boolean;
   status: RequestStatus;
+  attempts?: AttemptRecord[];
 }
+
+// a failed attempt says which provider is misbehaving, and an error long enough
+// to include a whole upstream body would bloat every row for no extra signal
+const MAX_ERROR_LENGTH = 500;
 
 @Injectable()
 export class RequestLogService {
@@ -22,9 +28,10 @@ export class RequestLogService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Records a served request. Returns immediately: the write happens in the
-   * background so the client never waits on it, and a metrics failure is logged
-   * rather than surfaced, because the user already got their answer.
+   * Records a served request and every attempt it took to serve it. Returns
+   * immediately: the write happens in the background so the client never waits
+   * on it, and a metrics failure is logged rather than surfaced, because the
+   * user already got their answer.
    */
   record(entry: RequestRecord): void {
     void this.prisma.request
@@ -41,6 +48,16 @@ export class RequestLogService {
           latencyMs: entry.latencyMs,
           cacheHit: entry.cacheHit,
           status: entry.status,
+          attempts: {
+            create: (entry.attempts ?? []).map((attempt) => ({
+              attempt: attempt.attempt,
+              provider: attempt.provider,
+              model: attempt.model,
+              status: attempt.status,
+              latencyMs: attempt.latencyMs,
+              error: attempt.error?.slice(0, MAX_ERROR_LENGTH),
+            })),
+          },
         },
       })
       .catch((error: unknown) => {

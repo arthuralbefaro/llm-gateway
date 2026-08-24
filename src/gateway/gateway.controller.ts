@@ -12,6 +12,7 @@ import {
   TokenUsage,
 } from '../providers/provider.types';
 import { RouterService } from '../router/router.service';
+import type { ServedTarget } from '../router/router.service';
 import { chatCompletionSchema } from './dto/chat-completion.schema';
 import type { ChatCompletionBody } from './dto/chat-completion.schema';
 import {
@@ -74,12 +75,14 @@ export class GatewayController {
               provider: CACHE_PROVIDER,
             },
             true,
+            body.model,
+            false,
           ),
         );
         return;
       }
 
-      const routed = await this.router.chat(req);
+      const routed = await this.router.chat(req, body.fallback);
 
       this.requestLog.record({
         apiKeyId,
@@ -90,12 +93,24 @@ export class GatewayController {
         latencyMs: routed.latencyMs,
         cacheHit: false,
         status: 'success',
+        attempts: routed.attempts,
       });
 
-      // storing must not delay the answer the caller is already waiting for
-      void this.cache.store(req, routed.result.content);
+      // a substituted model answers a different question well enough to return,
+      // but not well enough to cache under the requested model's key
+      if (routed.result.model === body.model) {
+        void this.cache.store(req, routed.result.content);
+      }
 
-      res.json(completionPayload(completionId(), routed.result, false));
+      res.json(
+        completionPayload(
+          completionId(),
+          routed.result,
+          false,
+          body.model,
+          routed.usedFallback,
+        ),
+      );
     } catch (error) {
       this.recordFailure(apiKeyId, body.model, error, Date.now() - startedAt);
       throw error;
@@ -135,25 +150,52 @@ export class GatewayController {
         }
         writeDelta(res, id, body.model, piece);
       }
-      writeFinal(res, id, body.model, NO_USAGE, true);
+      writeFinal(
+        res,
+        id,
+        body.model,
+        NO_USAGE,
+        true,
+        body.model,
+        CACHE_PROVIDER,
+        false,
+      );
       writeDone(res);
       res.end();
       return;
     }
 
     let content = '';
-    const stream = this.router.stream(req, (outcome) => {
-      this.requestLog.record({
-        apiKeyId,
-        provider: outcome.provider,
-        model: outcome.model,
-        usage: outcome.usage,
-        costUsd: outcome.costUsd,
-        latencyMs: outcome.latencyMs,
-        cacheHit: false,
-        status: 'success',
-      });
-    });
+    // the served target is only known once the stream opens, and the final
+    // chunk has to report it rather than the model the caller asked for
+    let served: ServedTarget = {
+      provider: 'unknown',
+      model: body.model,
+      usedFallback: false,
+    };
+
+    const stream = this.router.stream(
+      req,
+      {
+        onOpen: (target) => {
+          served = target;
+        },
+        onFinish: (outcome) => {
+          this.requestLog.record({
+            apiKeyId,
+            provider: outcome.provider,
+            model: outcome.model,
+            usage: outcome.usage,
+            costUsd: outcome.costUsd,
+            latencyMs: outcome.latencyMs,
+            cacheHit: false,
+            status: 'success',
+            attempts: outcome.attempts,
+          });
+        },
+      },
+      body.fallback,
+    );
     const iterator = stream[Symbol.asyncIterator]();
 
     // the first chunk is pulled before any header goes out, which keeps an
@@ -176,7 +218,16 @@ export class GatewayController {
       while (!current.done) {
         const chunk = current.value;
         if (chunk.done) {
-          writeFinal(res, id, body.model, chunk.usage ?? NO_USAGE, false);
+          writeFinal(
+            res,
+            id,
+            served.model,
+            chunk.usage ?? NO_USAGE,
+            false,
+            body.model,
+            served.provider,
+            served.usedFallback,
+          );
         } else if (chunk.delta) {
           content += chunk.delta;
           writeDelta(res, id, body.model, chunk.delta);
@@ -199,8 +250,13 @@ export class GatewayController {
       return;
     }
 
-    // a partial answer must not be stored as if it were the whole thing
-    if (!abort.signal.aborted && content.length > 0) {
+    // a partial answer must not be stored as if it were the whole thing, and a
+    // substituted model must not be stored under the requested model's key
+    if (
+      !abort.signal.aborted &&
+      content.length > 0 &&
+      served.model === body.model
+    ) {
       void this.cache.store(req, content);
     }
 

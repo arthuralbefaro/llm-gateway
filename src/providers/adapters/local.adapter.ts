@@ -11,7 +11,13 @@ import {
   TokenUsage,
 } from '../provider.types';
 
-const PROVIDER = 'local';
+const DEFAULT_NAME = 'local';
+const DEFAULT_ENV_PREFIX = 'LOCAL_PROVIDER';
+
+export interface LocalAdapterOptions {
+  name?: string;
+  envPrefix?: string;
+}
 
 interface ModelPrice {
   input: number;
@@ -35,25 +41,30 @@ const DEFAULT_FAILURE_STATUS = 503;
 
 @Injectable()
 export class LocalAdapter extends LlmProvider {
-  readonly name = PROVIDER;
+  readonly name: string;
 
   private readonly latencyMs: number;
   private readonly failureRate: number;
   private readonly failureStatus: number;
 
-  constructor(config: ConfigService) {
+  // a second instance under another name gives two providers serving the same
+  // models, which is what makes fallback and the breaker demonstrable without
+  // paying a real provider to go down
+  constructor(config: ConfigService, options: LocalAdapterOptions = {}) {
     super();
+    this.name = options.name ?? DEFAULT_NAME;
+    const prefix = options.envPrefix ?? DEFAULT_ENV_PREFIX;
+
     this.latencyMs = Number(
-      config.get<string>('LOCAL_PROVIDER_LATENCY_MS') ?? DEFAULT_LATENCY_MS,
+      config.get<string>(`${prefix}_LATENCY_MS`) ?? DEFAULT_LATENCY_MS,
     );
     // injected failure is what makes retry, fallback and the breaker testable
     // under load without paying a real provider to misbehave
     this.failureRate = Number(
-      config.get<string>('LOCAL_PROVIDER_FAILURE_RATE') ?? 0,
+      config.get<string>(`${prefix}_FAILURE_RATE`) ?? 0,
     );
     this.failureStatus = Number(
-      config.get<string>('LOCAL_PROVIDER_FAILURE_STATUS') ??
-        DEFAULT_FAILURE_STATUS,
+      config.get<string>(`${prefix}_FAILURE_STATUS`) ?? DEFAULT_FAILURE_STATUS,
     );
   }
 
@@ -72,7 +83,7 @@ export class LocalAdapter extends LlmProvider {
       content,
       usage: usageFor(req.messages, content),
       model: req.model,
-      provider: PROVIDER,
+      provider: this.name,
     };
   }
 
@@ -133,7 +144,7 @@ export class LocalAdapter extends LlmProvider {
     if (this.failureRate > 0 && Math.random() < this.failureRate) {
       throw new ProviderError(
         `injected failure with status ${this.failureStatus}`,
-        PROVIDER,
+        this.name,
         this.failureStatus,
         this.failureStatus === 429 || this.failureStatus >= 500,
       );
@@ -142,7 +153,7 @@ export class LocalAdapter extends LlmProvider {
 
   private throwIfAborted(signal: AbortSignal | undefined): void {
     if (signal?.aborted) {
-      throw new ProviderError('request aborted by the client', PROVIDER);
+      throw new ProviderError('request aborted by the client', this.name);
     }
   }
 }

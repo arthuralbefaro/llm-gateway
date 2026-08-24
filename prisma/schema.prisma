@@ -5,7 +5,7 @@ generator client {
 }
 
 datasource db {
-  provider   = "postgresql"
+  provider = "postgresql"
 }
 
 model ApiKey {
@@ -13,36 +13,55 @@ model ApiKey {
   name      String
   hash      String    @unique
   active    Boolean   @default(true)
+  rateLimit Int?
   createdAt DateTime  @default(now())
   requests  Request[]
 }
 
 model Request {
-  id              String   @id @default(uuid())
-  apiKeyId        String
-  apiKey          ApiKey   @relation(fields: [apiKeyId], references: [id])
-  provider        String
-  model           String
-  promptTokens    Int      @default(0)
-  completionTokens Int     @default(0)
-  costUsd         Decimal  @default(0) @db.Decimal(12, 8)
-  latencyMs       Int
-  cacheHit        Boolean  @default(false)
-  status          String
-  createdAt       DateTime @default(now())
+  id               String   @id @default(uuid())
+  apiKeyId         String
+  apiKey           ApiKey   @relation(fields: [apiKeyId], references: [id])
+  provider         String
+  model            String
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  costUsd          Decimal  @default(0) @db.Decimal(12, 8)
+  latencyMs        Int
+  cacheHit         Boolean  @default(false)
+  status           String
+  createdAt        DateTime @default(now())
+
+  attempts RequestAttempt[]
 
   @@index([apiKeyId, createdAt])
   @@index([createdAt])
 }
 
+model RequestAttempt {
+  id        String   @id @default(uuid())
+  requestId String
+  request   Request  @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  attempt   Int
+  provider  String
+  model     String
+  status    String
+  latencyMs Int
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@index([requestId])
+  @@index([provider, createdAt])
+}
+
 model CacheEntry {
-  id         String                       @id @default(uuid())
-  promptHash String                       @unique
+  id         String                     @id @default(uuid())
+  promptHash String                     @unique
   prompt     String
   response   String
   model      String
   embedding  Unsupported("vector(384)")
-  hits       Int                          @default(0)
-  createdAt  DateTime                     @default(now())
-  lastUsedAt DateTime                     @updatedAt
+  hits       Int                        @default(0)
+  createdAt  DateTime                   @default(now())
+  lastUsedAt DateTime                   @updatedAt
 }

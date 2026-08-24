@@ -18,13 +18,18 @@ export function completionPayload(
   id: string,
   result: ChatResult,
   cacheHit: boolean,
+  requestedModel: string,
+  usedFallback: boolean,
 ): Record<string, unknown> {
   return {
     id,
     object: 'chat.completion',
     created: Math.floor(Date.now() / 1000),
     model: result.model,
+    requested_model: requestedModel,
     provider: result.provider,
+    // never leave the caller assuming their first choice answered
+    fallback: usedFallback,
     cache_hit: cacheHit,
     choices: [
       {
@@ -74,12 +79,18 @@ export function writeFinal(
   model: string,
   usage: TokenUsage,
   cacheHit: boolean,
+  requestedModel: string,
+  provider: string,
+  usedFallback: boolean,
 ): void {
   writeData(res, {
     id,
     object: 'chat.completion.chunk',
     created: Math.floor(Date.now() / 1000),
     model,
+    requested_model: requestedModel,
+    provider,
+    fallback: usedFallback,
     cache_hit: cacheHit,
     choices: [{ index: 0, delta: {}, finish_reason: 'stop' }],
     usage: usagePayload(usage),

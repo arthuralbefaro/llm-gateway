@@ -11,6 +11,9 @@ export const chatCompletionSchema = z.object({
   temperature: z.number().min(0).max(2).optional(),
   max_tokens: z.number().int().positive().optional(),
   stream: z.boolean().default(false),
+  // opt out per request, a caller who benchmarked one model may prefer an
+  // error over a different model's answer
+  fallback: z.boolean().optional(),
 });
 
 export type ChatCompletionBody = z.infer<typeof chatCompletionSchema>;
