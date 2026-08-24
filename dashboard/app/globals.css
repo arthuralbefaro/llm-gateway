@@ -1,0 +1,194 @@
+:root {
+  --ink: #111827;
+  --muted: #6b7280;
+  --line: #e5e7eb;
+  --paper: #ffffff;
+  --ground: #f9fafb;
+  --warn: #92400e;
+  --warn-bg: #fef3c7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+
+main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+header h1 {
+  margin: 0 0 4px;
+  font-size: 24px;
+}
+
+header p {
+  margin: 0 0 8px;
+  color: var(--muted);
+}
+
+section {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+section h2 {
+  margin: 0 0 6px;
+  font-size: 17px;
+}
+
+.note {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.warn {
+  margin: 0 0 16px;
+  padding: 8px 12px;
+  background: var(--warn-bg);
+  color: var(--warn);
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.empty {
+  margin: 0;
+  padding: 28px;
+  text-align: center;
+  color: var(--muted);
+  background: var(--ground);
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.chart {
+  margin: 0;
+}
+
+.chart svg {
+  width: 100%;
+  height: auto;
+}
+
+.grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+
+.axis {
+  fill: var(--muted);
+  font-size: 11px;
+}
+
+.legend {
+  display: flex;
+  gap: 16px;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend i {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+/* dashed in the legend too, so estimated cost reads the same in both places */
+.legend i[data-dashed='true'] {
+  background-image: linear-gradient(90deg, currentColor 60%, transparent 60%);
+  opacity: 0.75;
+}
+
+.totals {
+  display: flex;
+  gap: 32px;
+  margin: 16px 0 0;
+}
+
+.totals dt {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.totals dd {
+  margin: 2px 0 0;
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+}
+
+.totals dd.estimated {
+  color: #a855f7;
+  border-bottom: 2px dashed currentColor;
+  display: inline-block;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+}
+
+th {
+  color: var(--muted);
+  font-weight: 500;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.state {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+}
+
+.state[data-state='closed'] {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.state[data-state='half-open'] {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.state[data-state='open'] {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.state[data-state='unknown'] {
+  background: var(--ground);
+  color: var(--muted);
+}
