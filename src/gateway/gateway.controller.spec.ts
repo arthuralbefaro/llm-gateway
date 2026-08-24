@@ -16,6 +16,7 @@ import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import type { AuthenticatedRequest } from '../common/guards/api-key.guard';
 import { RequestLogService } from '../metrics/request-log.service';
 import { CacheService } from '../cache/cache.service';
+import { RateLimitGuard } from '../rate-limit/rate-limit.guard';
 import type { RequestRecord } from '../metrics/request-log.service';
 import { GatewayController } from './gateway.controller';
 
@@ -136,6 +137,8 @@ describe('GatewayController', () => {
           return true;
         },
       })
+      .overrideGuard(RateLimitGuard)
+      .useValue({ canActivate: () => true })
       .compile();
 
     app = module.createNestApplication();

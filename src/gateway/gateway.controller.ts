@@ -5,6 +5,7 @@ import { ApiKeyId } from '../common/decorators/api-key-id.decorator';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { RequestLogService } from '../metrics/request-log.service';
+import { RateLimitGuard } from '../rate-limit/rate-limit.guard';
 import {
   ChatChunk,
   ChatRequest,
@@ -33,7 +34,9 @@ const NO_USAGE: TokenUsage = { promptTokens: 0, completionTokens: 0 };
 const CACHE_PROVIDER = 'cache';
 
 @Controller('v1/chat')
-@UseGuards(ApiKeyGuard)
+// order matters, the key has to be known before it can be counted, and a key
+// over its limit must not reach the cache or a provider
+@UseGuards(ApiKeyGuard, RateLimitGuard)
 export class GatewayController {
   private readonly logger = new Logger(GatewayController.name);
 

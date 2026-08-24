@@ -10,6 +10,8 @@ import { hashApiKey } from '../api-key';
 
 export interface AuthenticatedRequest extends Request {
   apiKeyId?: string;
+  // null means this key has no override and falls back to the global default
+  apiKeyRateLimit?: number | null;
 }
 
 @Injectable()
@@ -26,7 +28,7 @@ export class ApiKeyGuard implements CanActivate {
 
     const apiKey = await this.prisma.apiKey.findUnique({
       where: { hash: hashApiKey(presented) },
-      select: { id: true, active: true },
+      select: { id: true, active: true, rateLimit: true },
     });
 
     // an unknown key and a disabled one get the same answer, so the response
@@ -36,6 +38,7 @@ export class ApiKeyGuard implements CanActivate {
     }
 
     req.apiKeyId = apiKey.id;
+    req.apiKeyRateLimit = apiKey.rateLimit;
     return true;
   }
 }
