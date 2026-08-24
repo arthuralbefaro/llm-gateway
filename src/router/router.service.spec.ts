@@ -8,6 +8,7 @@ import {
   ProviderError,
   TokenUsage,
 } from '../providers/provider.types';
+import { MetricsService } from '../observability/metrics.service';
 import { RouterService } from './router.service';
 
 const FAST_RETRY = {
@@ -20,6 +21,12 @@ const FAST_RETRY = {
   BREAKER_WINDOW_MS: '30000',
   BREAKER_OPEN_MS: '30000',
 };
+
+// a real registry, so a duplicated metric name or a bad label would fail here
+// rather than only in production
+function metrics(): MetricsService {
+  return new MetricsService();
+}
 
 function config(): ConfigService {
   return {
@@ -121,14 +128,18 @@ const REQUEST: ChatRequest = {
 
 describe('RouterService', () => {
   it('rejects a model no provider supports', () => {
-    const router = new RouterService([new ScriptedProvider()], config());
+    const router = new RouterService(
+      [new ScriptedProvider()],
+      config(),
+      metrics(),
+    );
 
     expect(() => router.resolve('llama-3-70b')).toThrow(BadRequestException);
   });
 
   it('retries a retryable failure and reports the attempt count', async () => {
     const provider = new ScriptedProvider({ failures: 2 });
-    const router = new RouterService([provider], config());
+    const router = new RouterService([provider], config(), metrics());
 
     const routed = await router.chat(REQUEST);
 
@@ -144,7 +155,7 @@ describe('RouterService', () => {
 
   it('retries a stream that fails before its first chunk', async () => {
     const provider = new ScriptedProvider({ failures: 1 });
-    const router = new RouterService([provider], config());
+    const router = new RouterService([provider], config(), metrics());
 
     const chunks = await drain(REQUEST, router);
 
@@ -157,7 +168,7 @@ describe('RouterService', () => {
       failures: 1,
       failAfterFirstChunk: true,
     });
-    const router = new RouterService([provider], config());
+    const router = new RouterService([provider], config(), metrics());
 
     // the caller has the partial answer already, a second attempt would restart
     // the text midway through what they are reading
@@ -168,7 +179,7 @@ describe('RouterService', () => {
   it('falls back to another provider serving the same model', async () => {
     const primary = new ScriptedProvider({ name: 'primary', failures: 99 });
     const backup = new ScriptedProvider({ name: 'backup' });
-    const router = new RouterService([primary, backup], config());
+    const router = new RouterService([primary, backup], config(), metrics());
 
     const routed = await router.chat(REQUEST);
 
@@ -181,7 +192,7 @@ describe('RouterService', () => {
   it('records every attempt across providers, not only the last', async () => {
     const primary = new ScriptedProvider({ name: 'primary', failures: 99 });
     const backup = new ScriptedProvider({ name: 'backup' });
-    const router = new RouterService([primary, backup], config());
+    const router = new RouterService([primary, backup], config(), metrics());
 
     const routed = await router.chat(REQUEST);
 
@@ -201,7 +212,7 @@ describe('RouterService', () => {
       fatal: true,
     });
     const backup = new ScriptedProvider({ name: 'backup' });
-    const router = new RouterService([primary, backup], config());
+    const router = new RouterService([primary, backup], config(), metrics());
 
     const routed = await router.chat(REQUEST);
 
@@ -212,7 +223,7 @@ describe('RouterService', () => {
   it('does not fall back when the caller opted out', async () => {
     const primary = new ScriptedProvider({ name: 'primary', failures: 99 });
     const backup = new ScriptedProvider({ name: 'backup' });
-    const router = new RouterService([primary, backup], config());
+    const router = new RouterService([primary, backup], config(), metrics());
 
     await expect(router.chat(REQUEST, false)).rejects.toBeInstanceOf(
       ProviderError,
@@ -230,7 +241,7 @@ describe('RouterService', () => {
       name: 'sibling',
       models: ['local-large'],
     });
-    const router = new RouterService([primary, sibling], config());
+    const router = new RouterService([primary, sibling], config(), metrics());
 
     const routed = await router.chat({ ...REQUEST, model: 'local-small' });
 
@@ -245,7 +256,7 @@ describe('RouterService', () => {
       name: 'sibling',
       models: ['local-large'],
     });
-    const router = new RouterService([sibling], config());
+    const router = new RouterService([sibling], config(), metrics());
 
     await expect(
       router.chat({ ...REQUEST, model: 'local-small' }),
@@ -262,7 +273,7 @@ describe('RouterService', () => {
       name: 'sibling',
       models: ['local-large'],
     });
-    const router = new RouterService([exact, sibling], config());
+    const router = new RouterService([exact, sibling], config(), metrics());
 
     const targets = router.targets({ ...REQUEST, model: 'local-small' }, true);
 
@@ -275,7 +286,7 @@ describe('RouterService', () => {
   it('stops calling a provider whose breaker opened and keeps serving', async () => {
     const primary = new ScriptedProvider({ name: 'primary', failures: 999 });
     const backup = new ScriptedProvider({ name: 'backup' });
-    const router = new RouterService([primary, backup], config());
+    const router = new RouterService([primary, backup], config(), metrics());
 
     await router.chat(REQUEST);
     const callsAfterFirst = primary.chatCalls;
@@ -291,7 +302,7 @@ describe('RouterService', () => {
   it('does not count an open breaker against the provider that answers instead', async () => {
     const primary = new ScriptedProvider({ name: 'primary', failures: 999 });
     const backup = new ScriptedProvider({ name: 'backup' });
-    const router = new RouterService([primary, backup], config());
+    const router = new RouterService([primary, backup], config(), metrics());
 
     for (let i = 0; i < 5; i += 1) {
       await router.chat(REQUEST);
@@ -312,6 +323,7 @@ describe('RouterService', () => {
         new ScriptedProvider({ name: 'backup' }),
       ],
       config(),
+      metrics(),
     );
 
     expect(router.breakerSnapshots().map((s) => s.provider)).toEqual([

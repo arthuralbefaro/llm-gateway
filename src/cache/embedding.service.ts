@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Piscina from 'piscina';
+import { MetricsService } from '../observability/metrics.service';
 import { withSpan } from '../tracing/span';
 import type { EmbedTask, WorkerConfig } from './embedding.worker';
 
@@ -44,7 +45,10 @@ export class EmbeddingService implements OnModuleInit, OnModuleDestroy {
   private readonly size: number;
   private rejected = 0;
 
-  constructor(config: ConfigService) {
+  constructor(
+    config: ConfigService,
+    private readonly metrics?: MetricsService,
+  ) {
     this.modelId = config.get<string>('EMBEDDING_MODEL') ?? DEFAULT_MODEL;
     const cacheDir =
       config.get<string>('EMBEDDING_CACHE_DIR') ?? DEFAULT_CACHE_DIR;
@@ -103,10 +107,12 @@ export class EmbeddingService implements OnModuleInit, OnModuleDestroy {
       { 'embedding.pool_size': this.size, 'embedding.model': this.modelId },
       async (span) => {
         span.setAttribute('embedding.queued', this.pool.queueSize);
+        this.metrics?.recordEmbeddingQueue(this.pool.queueSize);
         try {
           return await this.pool.run({ text }, { signal });
         } catch (error) {
           this.rejected += 1;
+          this.metrics?.recordEmbeddingRejected();
           throw error instanceof Error ? error : new Error('embedding failed');
         }
       },

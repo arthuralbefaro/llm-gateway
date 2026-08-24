@@ -7,12 +7,16 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import type { AuthenticatedRequest } from '../common/guards/api-key.guard';
+import { MetricsService } from '../observability/metrics.service';
 import { withSpan } from '../tracing/span';
 import { RateLimitDecision, RateLimitService } from './rate-limit.service';
 
 @Injectable()
 export class RateLimitGuard implements CanActivate {
-  constructor(private readonly rateLimit: RateLimitService) {}
+  constructor(
+    private readonly rateLimit: RateLimitService,
+    private readonly metrics: MetricsService,
+  ) {}
 
   canActivate(context: ExecutionContext): Promise<boolean> {
     return withSpan('ratelimit.consume', {}, async (span) => {
@@ -35,6 +39,7 @@ export class RateLimitGuard implements CanActivate {
       span.setAttribute('ratelimit.degraded', decision.degraded);
 
       if (!decision.allowed) {
+        this.metrics.recordRateLimited();
         // a caller over the limit gets told when to come back rather than being
         // left to guess, and never reaches the cache or a provider
         throw new HttpException(

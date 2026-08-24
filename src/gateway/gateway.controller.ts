@@ -14,6 +14,8 @@ import {
   TokenUsage,
 } from '../providers/provider.types';
 import { RouterService } from '../router/router.service';
+import { MetricsService } from '../observability/metrics.service';
+import type { CacheResult } from '../observability/metrics.service';
 import { currentSpan, withSpan } from '../tracing/span';
 import type { ServedTarget } from '../router/router.service';
 import { chatCompletionSchema } from './dto/chat-completion.schema';
@@ -46,6 +48,7 @@ export class GatewayController {
     private readonly router: RouterService,
     private readonly cache: CacheService,
     private readonly requestLog: RequestLogService,
+    private readonly metrics: MetricsService,
   ) {}
 
   @Post('completions')
@@ -57,30 +60,48 @@ export class GatewayController {
     @ApiKeyId() apiKeyId: string,
     @Res() res: Response,
   ): Promise<void> {
+    const startedAt = Date.now();
+    // the outcome travels back as a return value rather than on the instance,
+    // because the controller is a singleton and concurrent requests would
+    // overwrite each other's result
+    let outcome: CacheResult = 'miss';
+
     // the span wraps the whole handler, whose promise only settles after
     // res.end, so a stream stays inside it instead of closing when the headers
     // flush and hiding every chunk that follows
-    await withSpan(
-      'gateway.completion',
-      {
-        'llm.requested_model': body.model,
-        'llm.stream': body.stream,
-        'llm.cache_requested': body.cache !== false,
-      },
-      () =>
-        body.stream
-          ? this.streamCompletion(body, apiKeyId, res)
-          : this.jsonCompletion(body, apiKeyId, res),
-    );
+    try {
+      outcome = await withSpan(
+        'gateway.completion',
+        {
+          'llm.requested_model': body.model,
+          'llm.stream': body.stream,
+          'llm.cache_requested': body.cache !== false,
+        },
+        () =>
+          body.stream
+            ? this.streamCompletion(body, apiKeyId, res)
+            : this.jsonCompletion(body, apiKeyId, res),
+      );
+    } finally {
+      // recorded here rather than per branch, so a thrown request is counted
+      // with the same latency the caller experienced
+      this.metrics.recordRequest(
+        'v1/chat/completions',
+        res.statusCode,
+        outcome,
+        (Date.now() - startedAt) / 1000,
+      );
+    }
   }
 
   private async jsonCompletion(
     body: ChatCompletionBody,
     apiKeyId: string,
     res: Response,
-  ): Promise<void> {
+  ): Promise<CacheResult> {
     const req = this.toChatRequest(body);
     const startedAt = Date.now();
+    const missed: CacheResult = body.cache === false ? 'bypassed' : 'miss';
 
     try {
       const hit = await this.lookup(body, req);
@@ -107,7 +128,7 @@ export class GatewayController {
             false,
           ),
         );
-        return;
+        return hit.kind;
       }
 
       const routed = await this.router.chat(req, body.fallback);
@@ -124,6 +145,17 @@ export class GatewayController {
         attempts: routed.attempts,
       });
 
+      this.metrics.recordUsage(
+        routed.result.provider,
+        routed.result.model,
+        routed.result.usage.promptTokens,
+        routed.result.usage.completionTokens,
+        routed.costUsd,
+        false,
+      );
+      if (routed.usedFallback) {
+        this.metrics.recordFallback(body.model, routed.result.model);
+      }
       annotate({
         'llm.provider': routed.result.provider,
         'llm.model': routed.result.model,
@@ -151,6 +183,7 @@ export class GatewayController {
           routed.usedFallback,
         ),
       );
+      return missed;
     } catch (error) {
       this.recordFailure(apiKeyId, body.model, error, Date.now() - startedAt);
       throw error;
@@ -161,7 +194,7 @@ export class GatewayController {
     body: ChatCompletionBody,
     apiKeyId: string,
     res: Response,
-  ): Promise<void> {
+  ): Promise<CacheResult> {
     const abort = new AbortController();
     // the body parser drains req and closes it before the handler runs, so req
     // close never fires here, res close is the disconnect signal
@@ -177,6 +210,7 @@ export class GatewayController {
     const req = { ...this.toChatRequest(body), signal: abort.signal };
     const startedAt = Date.now();
     const id = completionId();
+    const missed: CacheResult = body.cache === false ? 'bypassed' : 'miss';
 
     const hit = await this.lookup(body, req);
     if (hit) {
@@ -186,7 +220,7 @@ export class GatewayController {
       for (const piece of chunkText(hit.response)) {
         if (abort.signal.aborted) {
           res.end();
-          return;
+          return hit.kind;
         }
         writeDelta(res, id, body.model, piece);
       }
@@ -208,7 +242,7 @@ export class GatewayController {
       );
       writeDone(res);
       res.end();
-      return;
+      return hit.kind;
     }
 
     let content = '';
@@ -227,6 +261,17 @@ export class GatewayController {
           served = target;
         },
         onFinish: (outcome) => {
+          this.metrics.recordUsage(
+            outcome.provider,
+            outcome.model,
+            outcome.usage.promptTokens,
+            outcome.usage.completionTokens,
+            outcome.costUsd,
+            false,
+          );
+          if (outcome.usedFallback) {
+            this.metrics.recordFallback(body.model, outcome.model);
+          }
           annotate({
             'llm.provider': outcome.provider,
             'llm.model': outcome.model,
@@ -263,7 +308,7 @@ export class GatewayController {
     } catch (error) {
       if (abort.signal.aborted) {
         res.end();
-        return;
+        return missed;
       }
       this.recordFailure(apiKeyId, body.model, error, Date.now() - startedAt);
       throw error;
@@ -298,7 +343,7 @@ export class GatewayController {
       if (abort.signal.aborted) {
         this.logger.warn(`client disconnected, upstream aborted for ${id}`);
         res.end();
-        return;
+        return missed;
       }
       this.logger.error(`stream failed for ${id}: ${describe(error)}`);
       this.recordPartialStream(
@@ -311,7 +356,7 @@ export class GatewayController {
       );
       writeError(res, describe(error), statusOf(error));
       res.end();
-      return;
+      return missed;
     }
 
     // a partial answer must not be stored as if it were the whole thing, and a
@@ -326,6 +371,7 @@ export class GatewayController {
 
     writeDone(res);
     res.end();
+    return missed;
   }
 
   // reading is what the caller opted out of, writing still happens so the next

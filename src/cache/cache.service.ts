@@ -5,6 +5,7 @@ import Redis from 'ioredis';
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ChatRequest } from '../providers/provider.types';
+import { MetricsService } from '../observability/metrics.service';
 import { withSpan } from '../tracing/span';
 import { EmbeddingService } from './embedding.service';
 
@@ -43,6 +44,7 @@ export class CacheService implements OnModuleDestroy {
     config: ConfigService,
     private readonly prisma: PrismaService,
     private readonly embeddings: EmbeddingService,
+    private readonly metrics: MetricsService,
   ) {
     this.redis = new Redis(config.getOrThrow<string>('REDIS_URL'), {
       // the cache must never be the reason a request fails, so a dead redis
@@ -115,6 +117,7 @@ export class CacheService implements OnModuleDestroy {
         if (exact !== undefined) {
           span.setAttribute('cache.hit', true);
           span.setAttribute('cache.kind', 'exact');
+          this.metrics.recordCacheLookup('exact');
           return { response: exact, kind: 'exact', similarity: 1 };
         }
 
@@ -146,6 +149,7 @@ export class CacheService implements OnModuleDestroy {
         if (hit) {
           span.setAttribute('cache.kind', 'semantic');
         }
+        this.metrics.recordCacheLookup(hit ? 'semantic' : 'miss');
         return hit;
       },
     );
@@ -176,6 +180,9 @@ export class CacheService implements OnModuleDestroy {
         }
       } catch (error) {
         span.setAttribute('cache.store.skipped', true);
+        this.metrics.recordCacheStoreSkipped(
+          describe(error).includes('queue') ? 'queue_full' : 'error',
+        );
         this.logger.warn(`cache store skipped: ${describe(error)}`);
       }
     });

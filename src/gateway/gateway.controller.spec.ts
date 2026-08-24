@@ -17,6 +17,7 @@ import type { AuthenticatedRequest } from '../common/guards/api-key.guard';
 import { RequestLogService } from '../metrics/request-log.service';
 import { CacheService } from '../cache/cache.service';
 import { RateLimitGuard } from '../rate-limit/rate-limit.guard';
+import { MetricsService } from '../observability/metrics.service';
 import type { RequestRecord } from '../metrics/request-log.service';
 import { GatewayController } from './gateway.controller';
 
@@ -131,6 +132,8 @@ describe('GatewayController', () => {
         { provide: RequestLogService, useValue: requestLog },
         { provide: CacheService, useValue: cache },
         { provide: ConfigService, useValue: { get: () => undefined } },
+        // a real registry, so a bad metric name or label would fail here
+        MetricsService,
       ],
     })
       .overrideGuard(ApiKeyGuard)

@@ -57,6 +57,8 @@ export class CircuitBreaker {
     readonly provider: string,
     private readonly policy: BreakerPolicy,
     private readonly now: () => number = Date.now,
+    // observation only, it never influences whether a call is admitted
+    private readonly onTransition?: (to: BreakerState) => void,
   ) {}
 
   /**
@@ -119,7 +121,7 @@ export class CircuitBreaker {
       this.state === 'open' &&
       this.now() - this.openedAt >= this.policy.openMs
     ) {
-      this.state = 'half-open';
+      this.transition('half-open');
       this.probeInFlight = false;
     }
   }
@@ -149,14 +151,22 @@ export class CircuitBreaker {
   }
 
   private open(): void {
-    this.state = 'open';
+    this.transition('open');
     this.openedAt = this.now();
     this.probeInFlight = false;
   }
 
   private close(): void {
-    this.state = 'closed';
+    this.transition('closed');
     this.outcomes = [];
     this.probeInFlight = false;
+  }
+
+  private transition(to: BreakerState): void {
+    if (this.state === to) {
+      return;
+    }
+    this.state = to;
+    this.onTransition?.(to);
   }
 }

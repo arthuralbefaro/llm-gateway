@@ -1,0 +1,10 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: llm-gateway
+    # the gateway runs on the host while prometheus runs in a container, so it
+    # is reached through the docker host alias rather than a service name
+    static_configs:
+      - targets: ['host.docker.internal:3000']

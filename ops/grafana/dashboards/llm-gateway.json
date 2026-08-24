@@ -1,0 +1,231 @@
+{
+  "uid": "llm-gateway",
+  "title": "LLM Gateway",
+  "tags": ["llm-gateway"],
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Request rate by cache outcome",
+      "description": "Requests per second, split by whether the answer came from the exact cache, the semantic cache, a provider, or a caller who opted out of the cache.",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (cache) (rate(gateway_requests_total[1m]))",
+          "legendFormat": "{{cache}}"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Latency percentiles by cache outcome",
+      "description": "A cache moves the median and barely moves the tail, because the misses that remain are what p95 and p99 measure. Both are shown so the dashboard cannot imply otherwise.",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "fieldConfig": {
+        "defaults": { "unit": "s", "custom": { "fillOpacity": 0 } },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.5, sum by (le, cache) (rate(gateway_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "p50 {{cache}}"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.95, sum by (le, cache) (rate(gateway_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "p95 {{cache}}"
+        },
+        {
+          "refId": "C",
+          "expr": "histogram_quantile(0.99, sum by (le, cache) (rate(gateway_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "p99 {{cache}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Cache hit rate",
+      "description": "Exact and semantic hits over all lookups in the window.",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 8 },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "min": 0,
+          "max": 1,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "orange", "value": 0.3 },
+              { "color": "green", "value": 0.6 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(gateway_cache_lookups_total{result=~\"exact|semantic\"}[5m])) / clamp_min(sum(rate(gateway_cache_lookups_total[5m])), 0.0001)",
+          "legendFormat": "hit rate"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Cache lookups, exact against semantic",
+      "description": "Kept separate because they cost two orders of magnitude apart: a redis key lookup against a vector search.",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "fillOpacity": 30, "stacking": { "mode": "normal" } } },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (result) (rate(gateway_cache_lookups_total[1m]))",
+          "legendFormat": "{{result}}"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Cost by provider and model",
+      "description": "Confirmed and estimated cost are separate series. Estimated cost comes from a stream that died after emitting text, where the provider billed for output it never reported.",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 8 },
+      "fieldConfig": {
+        "defaults": { "unit": "currencyUSD", "custom": { "fillOpacity": 20 } },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (provider, model, estimated) (rate(gateway_cost_usd_total[5m]) * 300)",
+          "legendFormat": "{{provider}} {{model}} estimated={{estimated}}"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Provider attempts by outcome",
+      "description": "Counts every attempt, not only the one that answered, so a provider failing behind a working fallback is still visible.",
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 14 },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (provider, status) (rate(gateway_provider_attempts_total[1m]))",
+          "legendFormat": "{{provider}} {{status}}"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Circuit breaker state",
+      "description": "0 closed, 1 half open, 2 open.",
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 14 },
+      "fieldConfig": {
+        "defaults": {
+          "min": 0,
+          "max": 2,
+          "custom": { "fillOpacity": 30, "lineInterpolation": "stepAfter" }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "gateway_breaker_state",
+          "legendFormat": "{{provider}}"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Embedding queue and refusals",
+      "description": "The queue is bounded on purpose. Under overload a refused embedding skips the cache write rather than growing the backlog, so refusals rising while availability holds is the design working.",
+      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 14 },
+      "fieldConfig": {
+        "defaults": { "custom": { "fillOpacity": 20 } },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "gateway_embedding_queue_size",
+          "legendFormat": "queued"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(gateway_embedding_rejected_total[1m]))",
+          "legendFormat": "refused per second"
+        },
+        {
+          "refId": "C",
+          "expr": "sum by (reason) (rate(gateway_cache_stores_skipped_total[1m]))",
+          "legendFormat": "store skipped {{reason}}"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Rate limited and fallbacks",
+      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 21 },
+      "fieldConfig": {
+        "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(gateway_rate_limited_total[1m]))",
+          "legendFormat": "429 per second"
+        },
+        {
+          "refId": "B",
+          "expr": "sum by (from_model, to_model) (rate(gateway_fallbacks_total[1m]))",
+          "legendFormat": "{{from_model}} to {{to_model}}"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Tokens by provider and model",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 21 },
+      "fieldConfig": {
+        "defaults": { "custom": { "fillOpacity": 20 } },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (provider, model, kind) (rate(gateway_tokens_total[1m]))",
+          "legendFormat": "{{provider}} {{model}} {{kind}}"
+        }
+      ]
+    }
+  ]
+}

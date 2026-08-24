@@ -20,6 +20,7 @@ import {
   CircuitBreaker,
   CircuitOpenError,
 } from './circuit-breaker';
+import { MetricsService } from '../observability/metrics.service';
 import { withSpan } from '../tracing/span';
 import { equivalentModels } from './model-equivalence';
 import { RetryPolicy, withRetry } from './retry';
@@ -98,6 +99,7 @@ export class RouterService {
   constructor(
     @Inject(LLM_PROVIDERS) private readonly providers: LlmProvider[],
     config: ConfigService,
+    private readonly metrics: MetricsService,
   ) {
     this.policy = {
       maxAttempts: numberFrom(
@@ -314,7 +316,12 @@ export class RouterService {
   private breakerFor(provider: string): CircuitBreaker {
     let breaker = this.breakers.get(provider);
     if (!breaker) {
-      breaker = new CircuitBreaker(provider, this.breakerPolicy);
+      breaker = new CircuitBreaker(
+        provider,
+        this.breakerPolicy,
+        Date.now,
+        (to) => this.metrics.recordBreakerTransition(provider, to),
+      );
       this.breakers.set(provider, breaker);
     }
     return breaker;
@@ -362,11 +369,16 @@ export class RouterService {
               const value = await operation();
               record.status = 'success';
               breaker.recordSuccess();
+              this.metrics.recordAttempt(target.provider.name, 'success');
               span.setAttribute('llm.attempt_status', 'success');
               return value;
             } catch (error) {
               record.error = describe(error);
               breaker.recordFailure();
+              this.metrics.recordAttempt(
+                target.provider.name,
+                error instanceof CircuitOpenError ? 'circuit_open' : 'error',
+              );
               span.setAttribute('llm.attempt_status', 'error');
               throw error;
             } finally {
