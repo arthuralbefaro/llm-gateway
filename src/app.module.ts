@@ -9,6 +9,7 @@ import { RouterModule } from './router/router.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { MetricsModule } from './metrics/metrics.module';
 import { ObservabilityModule } from './observability/observability.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { ObservabilityModule } from './observability/observability.module';
     RouterModule,
     GatewayModule,
     MetricsModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
