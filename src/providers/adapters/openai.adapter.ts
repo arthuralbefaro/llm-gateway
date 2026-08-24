@@ -4,6 +4,7 @@ import OpenAI, { APIError } from 'openai';
 import type { CompletionUsage } from 'openai/resources/completions';
 import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import { LlmProvider } from '../llm-provider.abstract';
+import { retryAfterMs } from '../retry-after';
 import {
   ChatChunk,
   ChatMessage,
@@ -154,6 +155,7 @@ export class OpenAiAdapter extends LlmProvider {
         PROVIDER,
         status,
         this.isRetryable(status),
+        retryAfterMs(error.headers, Date.now()),
       );
     }
     if (error instanceof Error) {

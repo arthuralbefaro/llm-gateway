@@ -36,6 +36,9 @@ export class ProviderError extends Error {
     readonly provider: string,
     readonly status?: number,
     readonly retryable = false,
+    // what the provider asked us to wait, it knows its own recovery better
+    // than any backoff curve we could pick
+    readonly retryAfterMs?: number,
   ) {
     super(message);
     this.name = 'ProviderError';

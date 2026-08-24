@@ -1,4 +1,5 @@
 import { ExecutionContext, INestApplication } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import http, { Server } from 'node:http';
@@ -124,6 +125,7 @@ describe('GatewayController', () => {
         { provide: LLM_PROVIDERS, useValue: [stub] },
         { provide: RequestLogService, useValue: requestLog },
         { provide: CacheService, useValue: cache },
+        { provide: ConfigService, useValue: { get: () => undefined } },
       ],
     })
       .overrideGuard(ApiKeyGuard)

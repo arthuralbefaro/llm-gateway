@@ -31,16 +31,29 @@ const CHARS_PER_TOKEN = 4;
 
 const DEFAULT_LATENCY_MS = 150;
 
+const DEFAULT_FAILURE_STATUS = 503;
+
 @Injectable()
 export class LocalAdapter extends LlmProvider {
   readonly name = PROVIDER;
 
   private readonly latencyMs: number;
+  private readonly failureRate: number;
+  private readonly failureStatus: number;
 
   constructor(config: ConfigService) {
     super();
     this.latencyMs = Number(
       config.get<string>('LOCAL_PROVIDER_LATENCY_MS') ?? DEFAULT_LATENCY_MS,
+    );
+    // injected failure is what makes retry, fallback and the breaker testable
+    // under load without paying a real provider to misbehave
+    this.failureRate = Number(
+      config.get<string>('LOCAL_PROVIDER_FAILURE_RATE') ?? 0,
+    );
+    this.failureStatus = Number(
+      config.get<string>('LOCAL_PROVIDER_FAILURE_STATUS') ??
+        DEFAULT_FAILURE_STATUS,
     );
   }
 
@@ -51,6 +64,7 @@ export class LocalAdapter extends LlmProvider {
   async chat(req: ChatRequest): Promise<ChatResult> {
     await this.simulateLatency(this.latencyMs, req.signal);
     this.throwIfAborted(req.signal);
+    this.maybeFail();
 
     const content = answerFor(req.messages);
 
@@ -63,6 +77,11 @@ export class LocalAdapter extends LlmProvider {
   }
 
   async *stream(req: ChatRequest): AsyncGenerator<ChatChunk> {
+    // failing here keeps the injected failure retryable, a failure after the
+    // first chunk is a different scenario and belongs in a dedicated test
+    this.maybeFail();
+    await Promise.resolve();
+
     const content = answerFor(req.messages);
     const pieces = content.split(/(?<=\s)/);
     const perPiece = Math.max(
@@ -108,6 +127,17 @@ export class LocalAdapter extends LlmProvider {
         { once: true },
       );
     });
+  }
+
+  private maybeFail(): void {
+    if (this.failureRate > 0 && Math.random() < this.failureRate) {
+      throw new ProviderError(
+        `injected failure with status ${this.failureStatus}`,
+        PROVIDER,
+        this.failureStatus,
+        this.failureStatus === 429 || this.failureStatus >= 500,
+      );
+    }
   }
 
   private throwIfAborted(signal: AbortSignal | undefined): void {

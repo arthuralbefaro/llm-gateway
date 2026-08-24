@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import Anthropic, { APIError } from '@anthropic-ai/sdk';
 import type { MessageParam } from '@anthropic-ai/sdk/resources/messages';
 import { LlmProvider } from '../llm-provider.abstract';
+import { retryAfterMs } from '../retry-after';
 import {
   ChatChunk,
   ChatMessage,
@@ -197,6 +198,7 @@ export class AnthropicAdapter extends LlmProvider {
         PROVIDER,
         status,
         this.isRetryable(status),
+        retryAfterMs(error.headers, Date.now()),
       );
     }
     if (error instanceof Error) {
