@@ -113,7 +113,7 @@ export class GatewayController {
           'cache.kind': hit.kind,
         });
         this.logCacheHit(hit.kind, body.model, hit.similarity);
-        this.recordHit(apiKeyId, body.model, Date.now() - startedAt);
+        this.recordHit(apiKeyId, body.model, Date.now() - startedAt, hit.kind);
         res.json(
           completionPayload(
             completionId(),
@@ -215,7 +215,7 @@ export class GatewayController {
     const hit = await this.lookup(body, req);
     if (hit) {
       this.logCacheHit(hit.kind, body.model, hit.similarity);
-      this.recordHit(apiKeyId, body.model, Date.now() - startedAt);
+      this.recordHit(apiKeyId, body.model, Date.now() - startedAt, hit.kind);
       openSseStream(res);
       for (const piece of chunkText(hit.response)) {
         if (abort.signal.aborted) {
@@ -392,7 +392,12 @@ export class GatewayController {
     );
   }
 
-  private recordHit(apiKeyId: string, model: string, latencyMs: number): void {
+  private recordHit(
+    apiKeyId: string,
+    model: string,
+    latencyMs: number,
+    kind: string,
+  ): void {
     this.requestLog.record({
       apiKeyId,
       provider: CACHE_PROVIDER,
@@ -401,6 +406,7 @@ export class GatewayController {
       costUsd: 0,
       latencyMs,
       cacheHit: true,
+      cacheKind: kind,
       status: 'success',
     });
   }

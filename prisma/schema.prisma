@@ -30,6 +30,7 @@ model Request {
   costEstimated    Boolean  @default(false)
   latencyMs        Int
   cacheHit         Boolean  @default(false)
+  cacheKind        String?
   status           String
   createdAt        DateTime @default(now())
 

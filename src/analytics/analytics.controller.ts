@@ -45,11 +45,11 @@ export class AnalyticsController {
       window: describeWindow(window),
       bucket: query.bucket,
       rows: await this.analytics.hitRate(window, query.bucket),
-      breakdown: {
-        exact: null,
-        semantic: null,
-        unavailable_reason:
-          'Request records that a hit happened, not which store answered it. the split exists in the prometheus counter gateway_cache_lookups_total, and answering it from sql needs a column on Request.',
+      notes: {
+        why_split:
+          'exact and semantic are reported apart because they are not the same product. an exact hit returns in single milliseconds, a semantic hit runs a vector search whose tail sits close to a provider call, so a combined rate reads as "this share was fast" and is false when the semantic share is large.',
+        rows_before_the_column:
+          'requests recorded before cacheKind existed count in hits but in neither part, so the two can sum to less than the whole for older windows.',
       },
     };
   }

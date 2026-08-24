@@ -17,6 +17,9 @@ export interface RequestRecord {
   attempts?: AttemptRecord[];
   // costUsd stays the number to sum, this says how much to trust it
   costEstimated?: boolean;
+  // which store answered, because a semantic hit and an exact hit differ by an
+  // order of magnitude in latency and reporting them together hides that
+  cacheKind?: string;
 }
 
 // a failed attempt says which provider is misbehaving, and an error long enough
@@ -30,10 +33,10 @@ export class RequestLogService {
   constructor(private readonly prisma: PrismaService) {}
 
   /**
-   * Records a served request and every attempt it took to serve it. Returns
-   * immediately: the write happens in the background so the client never waits
+   * records a served request and every attempt it took to serve it
+   * returns immediately: the write happens in the background so the client never waits
    * on it, and a metrics failure is logged rather than surfaced, because the
-   * user already got their answer.
+   * user already got their answer
    */
   record(entry: RequestRecord): void {
     void this.prisma.request
@@ -50,6 +53,7 @@ export class RequestLogService {
           costEstimated: entry.costEstimated ?? false,
           latencyMs: entry.latencyMs,
           cacheHit: entry.cacheHit,
+          cacheKind: entry.cacheKind ?? null,
           status: entry.status,
           attempts: {
             create: (entry.attempts ?? []).map((attempt) => ({

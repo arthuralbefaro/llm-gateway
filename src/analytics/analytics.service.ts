@@ -23,7 +23,11 @@ export interface HitRateRow {
   bucket: Date;
   requests: number;
   hits: number;
+  exact_hits: number;
+  semantic_hits: number;
   hit_rate: number;
+  exact_rate: number;
+  semantic_rate: number;
 }
 
 export interface LatencyRow {
@@ -101,21 +105,31 @@ export class AnalyticsService {
   }
 
   /**
-   * cache hit rate per bucket
+   * Cache hit rate per bucket, split by which store answered.
    *
-   * exact and semantic cannot be separated here: Request records that a hit
-   * happened, not which store answered, prometheus counts them apart because
-   * the gateway knows at the time; the table would need a column to say so
-   * afterwards
+   * The split matters because the two are not the same product: an exact hit
+   * returns in single milliseconds and a semantic hit runs a vector search
+   * whose tail sits close to a provider call. A combined rate reads as "this
+   * share of requests was fast", which is false when the semantic share is
+   * large.
+   *
+   * Requests recorded before cacheKind existed count in hits but in neither
+   * part, so the two can sum to less than the whole for older windows.
    */
   hitRate(window: Window, bucket: Bucket): Promise<HitRateRow[]> {
     return this.prisma.$queryRaw<HitRateRow[]>(Prisma.sql`
       SELECT
-        date_trunc(${bucket}, "createdAt")                  AS bucket,
-        count(*)::int                                       AS requests,
-        count(*) FILTER (WHERE "cacheHit")::int             AS hits,
+        date_trunc(${bucket}, "createdAt")                    AS bucket,
+        count(*)::int                                         AS requests,
+        count(*) FILTER (WHERE "cacheHit")::int               AS hits,
+        count(*) FILTER (WHERE "cacheKind" = 'exact')::int    AS exact_hits,
+        count(*) FILTER (WHERE "cacheKind" = 'semantic')::int AS semantic_hits,
         (count(*) FILTER (WHERE "cacheHit"))::float8
-          / nullif(count(*), 0)                             AS hit_rate
+          / nullif(count(*), 0)                               AS hit_rate,
+        (count(*) FILTER (WHERE "cacheKind" = 'exact'))::float8
+          / nullif(count(*), 0)                               AS exact_rate,
+        (count(*) FILTER (WHERE "cacheKind" = 'semantic'))::float8
+          / nullif(count(*), 0)                               AS semantic_rate
       FROM "Request"
       WHERE "createdAt" >= ${window.from} AND "createdAt" < ${window.to}
       GROUP BY 1
