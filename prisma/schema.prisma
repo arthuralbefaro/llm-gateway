@@ -27,6 +27,7 @@ model Request {
   promptTokens     Int      @default(0)
   completionTokens Int      @default(0)
   costUsd          Decimal  @default(0) @db.Decimal(12, 8)
+  costEstimated    Boolean  @default(false)
   latencyMs        Int
   cacheHit         Boolean  @default(false)
   status           String

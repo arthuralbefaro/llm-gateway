@@ -146,6 +146,17 @@ export class RouterService {
     return [...exact, ...substitutes];
   }
 
+  /**
+   * Prices a usage figure the caller assembled itself, for the case where the
+   * provider never reported one.
+   */
+  estimateCostUsd(provider: string, model: string, usage: TokenUsage): number {
+    const found = this.providers.find(
+      (candidate) => candidate.name === provider,
+    );
+    return found ? found.estimateCostUsd(model, usage) : 0;
+  }
+
   allowsFallback(requested: boolean | undefined): boolean {
     return requested ?? this.fallbackByDefault;
   }

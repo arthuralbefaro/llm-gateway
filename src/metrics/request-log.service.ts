@@ -15,6 +15,8 @@ export interface RequestRecord {
   cacheHit: boolean;
   status: RequestStatus;
   attempts?: AttemptRecord[];
+  // costUsd stays the number to sum, this says how much to trust it
+  costEstimated?: boolean;
 }
 
 // a failed attempt says which provider is misbehaving, and an error long enough
@@ -45,6 +47,7 @@ export class RequestLogService {
           // a string keeps the full scale of the decimal column, a float would
           // round before postgres ever sees it
           costUsd: entry.costUsd.toFixed(8),
+          costEstimated: entry.costEstimated ?? false,
           latencyMs: entry.latencyMs,
           cacheHit: entry.cacheHit,
           status: entry.status,

@@ -244,7 +244,14 @@ export class GatewayController {
         return;
       }
       this.logger.error(`stream failed for ${id}: ${describe(error)}`);
-      this.recordFailure(apiKeyId, body.model, error, Date.now() - startedAt);
+      this.recordPartialStream(
+        apiKeyId,
+        body.model,
+        served,
+        content,
+        error,
+        Date.now() - startedAt,
+      );
       writeError(res, describe(error), statusOf(error));
       res.end();
       return;
@@ -283,6 +290,44 @@ export class GatewayController {
     });
   }
 
+  // a stream that dies after emitting text was billed for what it produced, and
+  // recording that as zero would understate cost in silence, so the tokens are
+  // estimated from the emitted text and the row says the number is an estimate
+  private recordPartialStream(
+    apiKeyId: string,
+    requestedModel: string,
+    served: ServedTarget,
+    content: string,
+    error: unknown,
+    latencyMs: number,
+  ): void {
+    if (content.length === 0) {
+      this.recordFailure(apiKeyId, requestedModel, error, latencyMs);
+      return;
+    }
+
+    const usage: TokenUsage = {
+      promptTokens: 0,
+      completionTokens: estimateTokens(content),
+    };
+
+    this.requestLog.record({
+      apiKeyId,
+      provider: served.provider,
+      model: served.model,
+      usage,
+      costUsd: this.router.estimateCostUsd(
+        served.provider,
+        served.model,
+        usage,
+      ),
+      costEstimated: true,
+      latencyMs,
+      cacheHit: false,
+      status: 'error',
+    });
+  }
+
   private recordFailure(
     apiKeyId: string,
     model: string,
@@ -309,6 +354,13 @@ export class GatewayController {
       maxTokens: body.max_tokens,
     };
   }
+}
+
+// rough on purpose, real tokenizers land near four characters per token and a
+// per provider tokenizer would be a dependency and a network call to price a
+// request that already failed
+function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 4);
 }
 
 function describe(error: unknown): string {
