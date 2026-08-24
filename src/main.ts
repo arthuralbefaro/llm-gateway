@@ -1,3 +1,4 @@
+import './tracing/tracing';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ProviderExceptionFilter } from './common/filters/provider-exception.filter';

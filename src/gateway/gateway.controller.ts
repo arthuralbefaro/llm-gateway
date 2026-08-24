@@ -14,6 +14,7 @@ import {
   TokenUsage,
 } from '../providers/provider.types';
 import { RouterService } from '../router/router.service';
+import { currentSpan, withSpan } from '../tracing/span';
 import type { ServedTarget } from '../router/router.service';
 import { chatCompletionSchema } from './dto/chat-completion.schema';
 import type { ChatCompletionBody } from './dto/chat-completion.schema';
@@ -56,17 +57,40 @@ export class GatewayController {
     @ApiKeyId() apiKeyId: string,
     @Res() res: Response,
   ): Promise<void> {
-    if (body.stream) {
-      await this.streamCompletion(body, apiKeyId, res);
-      return;
-    }
+    // the span wraps the whole handler, whose promise only settles after
+    // res.end, so a stream stays inside it instead of closing when the headers
+    // flush and hiding every chunk that follows
+    await withSpan(
+      'gateway.completion',
+      {
+        'llm.requested_model': body.model,
+        'llm.stream': body.stream,
+        'llm.cache_requested': body.cache !== false,
+      },
+      () =>
+        body.stream
+          ? this.streamCompletion(body, apiKeyId, res)
+          : this.jsonCompletion(body, apiKeyId, res),
+    );
+  }
 
+  private async jsonCompletion(
+    body: ChatCompletionBody,
+    apiKeyId: string,
+    res: Response,
+  ): Promise<void> {
     const req = this.toChatRequest(body);
     const startedAt = Date.now();
 
     try {
       const hit = await this.lookup(body, req);
       if (hit) {
+        annotate({
+          'llm.provider': CACHE_PROVIDER,
+          'llm.model': body.model,
+          'cache.hit': true,
+          'cache.kind': hit.kind,
+        });
         this.logCacheHit(hit.kind, body.model, hit.similarity);
         this.recordHit(apiKeyId, body.model, Date.now() - startedAt);
         res.json(
@@ -98,6 +122,18 @@ export class GatewayController {
         cacheHit: false,
         status: 'success',
         attempts: routed.attempts,
+      });
+
+      annotate({
+        'llm.provider': routed.result.provider,
+        'llm.model': routed.result.model,
+        'llm.fallback': routed.usedFallback,
+        'llm.attempts': routed.attempts.length,
+        'llm.prompt_tokens': routed.result.usage.promptTokens,
+        'llm.completion_tokens': routed.result.usage.completionTokens,
+        'llm.cost_usd': routed.costUsd,
+        'llm.cost_estimated': false,
+        'cache.hit': false,
       });
 
       // a substituted model answers a different question well enough to return,
@@ -154,6 +190,12 @@ export class GatewayController {
         }
         writeDelta(res, id, body.model, piece);
       }
+      annotate({
+        'llm.provider': CACHE_PROVIDER,
+        'llm.model': body.model,
+        'cache.hit': true,
+        'cache.kind': hit.kind,
+      });
       writeFinal(
         res,
         id,
@@ -185,6 +227,17 @@ export class GatewayController {
           served = target;
         },
         onFinish: (outcome) => {
+          annotate({
+            'llm.provider': outcome.provider,
+            'llm.model': outcome.model,
+            'llm.fallback': outcome.usedFallback,
+            'llm.attempts': outcome.attempts.length,
+            'llm.prompt_tokens': outcome.usage.promptTokens,
+            'llm.completion_tokens': outcome.usage.completionTokens,
+            'llm.cost_usd': outcome.costUsd,
+            'llm.cost_estimated': false,
+            'cache.hit': false,
+          });
           this.requestLog.record({
             apiKeyId,
             provider: outcome.provider,
@@ -377,6 +430,12 @@ export class GatewayController {
 // request that already failed
 function estimateTokens(text: string): number {
   return Math.ceil(text.length / 4);
+}
+
+// attributes land on whichever span is active, which is the completion span
+// for both paths
+function annotate(attributes: Record<string, string | number | boolean>): void {
+  currentSpan()?.setAttributes(attributes);
 }
 
 function describe(error: unknown): string {

@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import Piscina from 'piscina';
+import { withSpan } from '../tracing/span';
 import type { EmbedTask, WorkerConfig } from './embedding.worker';
 
 const DEFAULT_MODEL = 'Xenova/multilingual-e5-small';
@@ -97,12 +98,19 @@ export class EmbeddingService implements OnModuleInit, OnModuleDestroy {
    * a request.
    */
   async embed(text: string, signal?: AbortSignal): Promise<number[]> {
-    try {
-      return await this.pool.run({ text }, { signal });
-    } catch (error) {
-      this.rejected += 1;
-      throw error instanceof Error ? error : new Error('embedding failed');
-    }
+    return withSpan(
+      'embedding.embed',
+      { 'embedding.pool_size': this.size, 'embedding.model': this.modelId },
+      async (span) => {
+        span.setAttribute('embedding.queued', this.pool.queueSize);
+        try {
+          return await this.pool.run({ text }, { signal });
+        } catch (error) {
+          this.rejected += 1;
+          throw error instanceof Error ? error : new Error('embedding failed');
+        }
+      },
+    );
   }
 
   stats(): PoolStats {

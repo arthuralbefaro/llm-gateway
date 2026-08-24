@@ -20,6 +20,7 @@ import {
   CircuitBreaker,
   CircuitOpenError,
 } from './circuit-breaker';
+import { withSpan } from '../tracing/span';
 import { equivalentModels } from './model-equivalence';
 import { RetryPolicy, withRetry } from './retry';
 
@@ -329,34 +330,50 @@ export class RouterService {
 
     return withRetry(
       async () => {
-        // refusing here rather than inside the retry keeps a dead provider from
-        // burning the attempt budget that the next target needs
-        if (!breaker.tryAcquire()) {
-          throw new CircuitOpenError(target.provider.name);
-        }
+        const attemptNumber = attempts.length + 1;
+        return withSpan(
+          'provider.attempt',
+          {
+            'llm.provider': target.provider.name,
+            'llm.model': target.model,
+            'llm.attempt': attemptNumber,
+            // captured before the decision, so the trace shows what the router
+            // knew rather than what the breaker looked like afterwards
+            'breaker.state': breaker.snapshot().state,
+          },
+          async (span) => {
+            // refusing here rather than inside the retry keeps a dead provider
+            // from burning the attempt budget that the next target needs
+            if (!breaker.tryAcquire()) {
+              throw new CircuitOpenError(target.provider.name);
+            }
 
-        const attemptStartedAt = Date.now();
-        const record: AttemptRecord = {
-          attempt: attempts.length + 1,
-          provider: target.provider.name,
-          model: target.model,
-          status: 'error',
-          latencyMs: 0,
-        };
-        attempts.push(record);
+            const attemptStartedAt = Date.now();
+            const record: AttemptRecord = {
+              attempt: attemptNumber,
+              provider: target.provider.name,
+              model: target.model,
+              status: 'error',
+              latencyMs: 0,
+            };
+            attempts.push(record);
 
-        try {
-          const value = await operation();
-          record.status = 'success';
-          breaker.recordSuccess();
-          return value;
-        } catch (error) {
-          record.error = describe(error);
-          breaker.recordFailure();
-          throw error;
-        } finally {
-          record.latencyMs = Date.now() - attemptStartedAt;
-        }
+            try {
+              const value = await operation();
+              record.status = 'success';
+              breaker.recordSuccess();
+              span.setAttribute('llm.attempt_status', 'success');
+              return value;
+            } catch (error) {
+              record.error = describe(error);
+              breaker.recordFailure();
+              span.setAttribute('llm.attempt_status', 'error');
+              throw error;
+            } finally {
+              record.latencyMs = Date.now() - attemptStartedAt;
+            }
+          },
+        );
       },
       {
         policy: this.policy,

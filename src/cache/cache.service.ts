@@ -5,6 +5,7 @@ import Redis from 'ioredis';
 import { Prisma } from '../generated/prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ChatRequest } from '../providers/provider.types';
+import { withSpan } from '../tracing/span';
 import { EmbeddingService } from './embedding.service';
 
 // see docs/adr/0001, below this a translation scores as a paraphrase
@@ -84,27 +85,70 @@ export class CacheService implements OnModuleDestroy {
 
     const prompt = normalize(req);
 
-    try {
-      const cached = parseExact(
-        await this.redis.get(redisKey(req.model, prompt)),
-      );
-      if (cached) {
-        // counted in the background, the exact path exists to avoid touching
-        // postgres and must not start waiting on it now
-        void this.countHit(cached.id);
-        return { response: cached.response, kind: 'exact', similarity: 1 };
-      }
-    } catch (error) {
-      this.logger.warn(`exact lookup skipped: ${describe(error)}`);
-    }
+    return withSpan(
+      'cache.lookup',
+      { 'llm.model': req.model },
+      async (span) => {
+        const exact = await withSpan(
+          'cache.lookup.exact',
+          { 'cache.store': 'redis' },
+          async (child) => {
+            try {
+              const cached = parseExact(
+                await this.redis.get(redisKey(req.model, prompt)),
+              );
+              child.setAttribute('cache.hit', cached !== undefined);
+              if (cached) {
+                // counted in the background, the exact path exists to avoid
+                // touching postgres and must not start waiting on it now
+                void this.countHit(cached.id);
+                return cached.response;
+              }
+            } catch (error) {
+              child.setAttribute('cache.degraded', true);
+              this.logger.warn(`exact lookup skipped: ${describe(error)}`);
+            }
+            return undefined;
+          },
+        );
 
-    try {
-      return await this.semanticLookup(req.model, prompt, req.signal);
-    } catch (error) {
-      // an unavailable cache costs latency, never availability
-      this.logger.warn(`semantic lookup skipped: ${describe(error)}`);
-      return undefined;
-    }
+        if (exact !== undefined) {
+          span.setAttribute('cache.hit', true);
+          span.setAttribute('cache.kind', 'exact');
+          return { response: exact, kind: 'exact', similarity: 1 };
+        }
+
+        const hit = await withSpan(
+          'cache.lookup.semantic',
+          { 'cache.store': 'pgvector' },
+          async (child) => {
+            try {
+              const found = await this.semanticLookup(
+                req.model,
+                prompt,
+                req.signal,
+              );
+              child.setAttribute('cache.hit', found !== undefined);
+              if (found) {
+                child.setAttribute('cache.similarity', found.similarity);
+              }
+              return found;
+            } catch (error) {
+              // an unavailable cache costs latency, never availability
+              child.setAttribute('cache.degraded', true);
+              this.logger.warn(`semantic lookup skipped: ${describe(error)}`);
+              return undefined;
+            }
+          },
+        );
+
+        span.setAttribute('cache.hit', hit !== undefined);
+        if (hit) {
+          span.setAttribute('cache.kind', 'semantic');
+        }
+        return hit;
+      },
+    );
   }
 
   async store(req: ChatRequest, response: string): Promise<void> {
@@ -115,9 +159,10 @@ export class CacheService implements OnModuleDestroy {
     const prompt = normalize(req);
     const hash = promptHash(req.model, prompt);
 
-    try {
-      const embedding = await this.embeddings.embed(prompt);
-      const rows = await this.prisma.$queryRaw<{ id: string }[]>(Prisma.sql`
+    await withSpan('cache.store', { 'llm.model': req.model }, async (span) => {
+      try {
+        const embedding = await this.embeddings.embed(prompt);
+        const rows = await this.prisma.$queryRaw<{ id: string }[]>(Prisma.sql`
         INSERT INTO "CacheEntry" ("id", "promptHash", "prompt", "response", "model", "embedding", "lastUsedAt")
         VALUES (gen_random_uuid()::text, ${hash}, ${prompt}, ${response}, ${req.model}, ${toVector(embedding)}::vector, now())
         ON CONFLICT ("promptHash") DO UPDATE
@@ -125,13 +170,15 @@ export class CacheService implements OnModuleDestroy {
         RETURNING "id"
       `);
 
-      const id = rows.at(0)?.id;
-      if (id) {
-        await this.setExact(req.model, prompt, id, response);
+        const id = rows.at(0)?.id;
+        if (id) {
+          await this.setExact(req.model, prompt, id, response);
+        }
+      } catch (error) {
+        span.setAttribute('cache.store.skipped', true);
+        this.logger.warn(`cache store skipped: ${describe(error)}`);
       }
-    } catch (error) {
-      this.logger.warn(`cache store skipped: ${describe(error)}`);
-    }
+    });
   }
 
   onModuleDestroy(): void {
