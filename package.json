@@ -39,6 +39,7 @@
     "openai": "^7.5.0",
     "pg": "^8.23.0",
     "pino-http": "^11.0.0",
+    "piscina": "^5.3.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
     "zod": "^4.4.3"

@@ -99,7 +99,7 @@ export class CacheService implements OnModuleDestroy {
     }
 
     try {
-      return await this.semanticLookup(req.model, prompt);
+      return await this.semanticLookup(req.model, prompt, req.signal);
     } catch (error) {
       // an unavailable cache costs latency, never availability
       this.logger.warn(`semantic lookup skipped: ${describe(error)}`);
@@ -141,8 +141,11 @@ export class CacheService implements OnModuleDestroy {
   private async semanticLookup(
     model: string,
     prompt: string,
+    signal?: AbortSignal,
   ): Promise<CacheHit | undefined> {
-    const embedding = toVector(await this.embeddings.embed(prompt));
+    // a lookup whose client has already gone is wasted work, but a store is
+    // not, because the answer was paid for and the next caller still wants it
+    const embedding = toVector(await this.embeddings.embed(prompt, signal));
 
     // ordering by distance with limit 1 is what lets the hnsw index do the work
     const rows = await this.prisma.$queryRaw<NeighbourRow[]>(Prisma.sql`
