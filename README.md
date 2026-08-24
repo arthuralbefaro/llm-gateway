@@ -1,101 +1,103 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# llm-gateway
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+An LLM gateway with a measured semantic cache. One endpoint routes chat
+completions across providers with retry, fallback and a circuit breaker, caches
+answers exactly and — only when a caller opts in — by embedding similarity,
+because the measurement showed similarity does not imply the same answer.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This README is being rebuilt. Architecture, measured results and the full
+document index land with the week 6 closing. `docs/api.md` describes the API,
+`docs/adr/` the decisions, `docs/evals/cache-quality.md` the cache measurement.
 
-## Description
+## Prerequisites
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- Docker Desktop (compose v2)
+- Node 24 and pnpm 11 only if you want to run the gateway outside Docker
 
-## Project setup
+## Setup
 
-```bash
-$ pnpm install
-$ docker compose up -d
+```powershell
+git clone <repo-url> llm-gateway
+cd llm-gateway
+docker compose up -d --build
 ```
 
-> **Non-default ports:** Postgres listens on `5433` and Redis on `6380` so they do not collide with native Postgres/Redis installations, which hijack `5432`/`6379` and make the application talk to the wrong server.
+The first build downloads the embedding model (about 130 MB) into the image, so
+the gateway boots warm instead of downloading on first request.
 
-## Compile and run the project
+Migrations and the seed run automatically in the one-shot `migrate` service.
+The development API key is printed once in its logs:
 
-```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+```powershell
+docker compose logs migrate
 ```
 
-## Run tests
+Copy the `llmg_...` value. Only its hash is stored; if you lose it:
 
-```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+```powershell
+docker compose run --rm migrate node seed-dist/prisma/seed.js --rotate
 ```
 
-## Deployment
+Smoke test:
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+```powershell
+$key = "llmg_..."
+Invoke-RestMethod -Method Post -Uri http://localhost:3000/v1/chat/completions `
+  -Headers @{ Authorization = "Bearer $key" } -ContentType 'application/json' `
+  -Body '{"model":"local-small","messages":[{"role":"user","content":"hello"}]}'
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+A `local-small` request is served by the built-in simulated provider, so no
+provider API key is needed to see the system work.
 
-## Resources
+### Analytics and dashboard
 
-Check out a few resources that may come in handy when working with NestJS:
+The analytics API and the dashboard need a shared token. Create `.env` from the
+example and set any non-empty value:
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```powershell
+Copy-Item .env.example .env
+# edit ANALYTICS_TOKEN in .env, then
+docker compose up -d gateway dashboard
+```
 
-## Support
+Without it the gateway still serves completions; the analytics endpoints return
+401 and the dashboard says the token is missing.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Ports
 
-## Stay in touch
+| Port | Service | Why not the default |
+|---|---|---|
+| 3000 | gateway | |
+| 3001 | Grafana | 3000 is taken by the gateway |
+| 3002 | dashboard | |
+| 5433 | Postgres | a local Postgres often already holds 5432, and a gateway silently talking to the wrong database is a failure nothing reports |
+| 6380 | Redis | same reasoning for a local Redis on 6379 |
+| 9090 | Prometheus | |
+| 16686 | Jaeger UI | |
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Development outside Docker
 
-## License
+```powershell
+Copy-Item .env.example .env
+docker compose up -d postgres redis jaeger prometheus grafana
+pnpm install
+pnpm prisma generate
+pnpm db:migrate
+npx ts-node prisma/seed.ts
+pnpm build
+pnpm start:prod
+```
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+The first request after a cold start downloads the model into `.models` (about
+130 MB) and loads it, which takes tens of seconds once; the boot log prints the
+per-worker load time.
+
+## Checks
+
+```powershell
+pnpm lint
+pnpm build
+pnpm test
+cd evals; uv run ruff check .; uv run pytest -q
+```

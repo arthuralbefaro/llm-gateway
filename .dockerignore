@@ -1,0 +1,12 @@
+node_modules
+dashboard/node_modules
+dashboard/.next
+dist
+.models
+.git
+.env
+docs
+evals
+test/load
+*.log
+coverage

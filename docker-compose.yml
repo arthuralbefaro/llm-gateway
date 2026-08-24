@@ -1,3 +1,7 @@
+# postgres publishes on 5433 and redis on 6380 because a developer machine
+# often has local installs occupying 5432 and 6379, and a gateway that silently
+# talks to the wrong database is the kind of failure nothing reports. inside
+# the compose network the services use their default ports.
 services:
   postgres:
     image: pgvector/pgvector:pg17
@@ -11,12 +15,63 @@ services:
       test: ['CMD-SHELL', 'pg_isready -U gateway']
       interval: 5s
       retries: 10
-  
+
   redis:
     image: redis:7-alpine
     ports: ['6380:6379']
     command: redis-server --appendonly yes
     volumes: ['redisdata:/data']
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      retries: 10
+
+  # one-shot, applies migrations and seeds the development key, whose plaintext
+  # appears once in this service's logs: docker compose logs migrate
+  migrate:
+    build:
+      context: .
+      target: build
+    environment:
+      DATABASE_URL: postgresql://gateway:gateway@postgres:5432/gateway?schema=public
+    command: sh -c "npx prisma migrate deploy && node seed-dist/prisma/seed.js"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: 'no'
+
+  gateway:
+    build:
+      context: .
+      target: runtime
+    environment:
+      DATABASE_URL: postgresql://gateway:gateway@postgres:5432/gateway?schema=public
+      REDIS_URL: redis://redis:6379
+      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: http://jaeger:4318/v1/traces
+      # empty means the analytics api answers 401 and the dashboard says the
+      # token is missing, set it in .env to enable both
+      ANALYTICS_TOKEN: ${ANALYTICS_TOKEN:-}
+      PORT: 3000
+    ports: ['3000:3000']
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+      jaeger:
+        condition: service_started
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: dashboard/Dockerfile
+    environment:
+      GATEWAY_URL: http://gateway:3000
+      ANALYTICS_TOKEN: ${ANALYTICS_TOKEN:-}
+    ports: ['3002:3002']
+    depends_on:
+      gateway:
+        condition: service_healthy
 
   jaeger:
     image: jaegertracing/all-in-one:1.76.0

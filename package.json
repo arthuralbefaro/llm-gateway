@@ -1,6 +1,7 @@
 {
   "name": "llm-gateway",
   "version": "0.0.1",
+  "packageManager": "pnpm@11.21.0",
   "description": "",
   "author": "",
   "private": true,
