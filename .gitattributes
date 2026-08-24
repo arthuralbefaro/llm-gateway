@@ -1,0 +1,4 @@
+# lf everywhere, a crlf checkout changes every docker layer hash and forces a
+# full rebuild on a fresh clone of the exact same commit
+* text=auto eol=lf
+*.png binary

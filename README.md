@@ -13,6 +13,8 @@ document index land with the week 6 closing. `docs/api.md` describes the API,
 
 - Docker Desktop (compose v2)
 - Node 24 and pnpm 11 only if you want to run the gateway outside Docker
+- Python 3.12 with [uv](https://docs.astral.sh/uv/) only for the evaluation
+  suite in `evals/`
 
 ## Setup
 
@@ -24,6 +26,10 @@ docker compose up -d --build
 
 The first build downloads the embedding model (about 130 MB) into the image, so
 the gateway boots warm instead of downloading on first request.
+
+A first build pulls hundreds of packages, and a transient registry or layer
+error can fail it. Run the same command again: Docker resumes from cache and
+only the failed step repeats.
 
 Migrations and the seed run automatically in the one-shot `migrate` service.
 The development API key is printed once in its logs:
@@ -95,9 +101,17 @@ per-worker load time.
 
 ## Checks
 
+From a clean clone, the generated Prisma client has to exist before anything
+compiles:
+
 ```powershell
+pnpm install
+pnpm prisma generate
 pnpm lint
 pnpm build
 pnpm test
-cd evals; uv run ruff check .; uv run pytest -q
+cd evals; uv run ruff check .; uv run pytest -q; cd ..
 ```
+
+The tests need no database, no Redis and no model download: infrastructure is
+stubbed and the embedding specs inject a test worker.
