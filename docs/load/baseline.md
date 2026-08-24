@@ -1,5 +1,10 @@
 # Load and chaos report
 
+*Measured before semantic lookup became opt-in (ADR 0010). Scenarios
+using `cache: false` or `temperature` bypasses are unaffected; the
+default read path changed and is remeasured in
+[read-path-after-opt-in.md](read-path-after-opt-in.md).*
+
 ## Execution environment
 
 Every number below was produced on one laptop running everything at once. That

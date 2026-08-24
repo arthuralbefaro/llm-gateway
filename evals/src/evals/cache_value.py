@@ -144,7 +144,7 @@ def hit_distribution(entries: list[EntryRow]) -> dict[int, int]:
 
 
 def concentration(entries: list[EntryRow]) -> tuple[int, int, float]:
-    """How few entries carry how much of the benefit."""
+    """how few entries carry how much of the benefit"""
     hits = np.array(sorted((entry.hits for entry in entries), reverse=True))
     total = int(hits.sum())
     if total == 0:
@@ -189,11 +189,11 @@ def hit_rate(requests: list[RequestRow]) -> float:
 def disuse_policy_effect(
     entries: list[EntryRow], window_seconds: float
 ) -> tuple[int, str] | None:
-    """Entries a disuse expiry would evict, or None when the data cannot say.
+    """entries a disuse expiry would evict, or None when the data cannot say
 
-    Returns None rather than a number when the cache was not observed for long
+    returns None rather than a number when the cache was not observed for long
     enough, because an entry written seconds before the export is indistinguishable
-    from one that fell out of use.
+    from one that fell out of use
     """
     times = [row.created_at for row in entries]
     observed = (max(row.last_used_at for row in entries) - min(times)).total_seconds()

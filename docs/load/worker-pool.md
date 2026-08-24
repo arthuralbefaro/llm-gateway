@@ -1,5 +1,10 @@
 # Worker pool for the embedding
 
+*Measured before semantic lookup became opt-in (ADR 0010). Scenarios
+using `cache: false` or `temperature` bypasses are unaffected; the
+default read path changed and is remeasured in
+[read-path-after-opt-in.md](read-path-after-opt-in.md).*
+
 Follow-up to [the baseline](baseline.md), which isolated the bottleneck: ONNX
 inference is synchronous CPU work on the main thread, so every request waits
 behind the embeddings of the requests before it. This is item 1 of that report's

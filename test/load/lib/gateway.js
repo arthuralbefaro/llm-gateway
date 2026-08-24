@@ -19,6 +19,11 @@ export function completion(prompt, options = {}) {
   if (options.bypassCache) {
     body.cache = false;
   }
+  // 'semantic' opts into similarity lookup, which is also how the pre adr 0010
+  // default read path is reproduced for comparison
+  if (options.cacheMode) {
+    body.cache = options.cacheMode;
+  }
   if (options.fallback !== undefined) {
     body.fallback = options.fallback;
   }
