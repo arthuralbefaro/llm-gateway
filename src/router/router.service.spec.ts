@@ -15,6 +15,10 @@ const FAST_RETRY = {
   RETRY_MAX_ELAPSED_MS: '10000',
   RETRY_BASE_DELAY_MS: '1',
   RETRY_MAX_DELAY_MS: '2',
+  BREAKER_FAILURE_RATIO: '0.5',
+  BREAKER_MINIMUM_VOLUME: '3',
+  BREAKER_WINDOW_MS: '30000',
+  BREAKER_OPEN_MS: '30000',
 };
 
 function config(): ConfigService {
@@ -265,6 +269,54 @@ describe('RouterService', () => {
     expect(targets.map((t) => `${t.provider.name}/${t.model}`)).toEqual([
       'exact/local-small',
       'sibling/local-large',
+    ]);
+  });
+
+  it('stops calling a provider whose breaker opened and keeps serving', async () => {
+    const primary = new ScriptedProvider({ name: 'primary', failures: 999 });
+    const backup = new ScriptedProvider({ name: 'backup' });
+    const router = new RouterService([primary, backup], config());
+
+    await router.chat(REQUEST);
+    const callsAfterFirst = primary.chatCalls;
+    expect(callsAfterFirst).toBeGreaterThanOrEqual(3);
+
+    const routed = await router.chat(REQUEST);
+
+    expect(routed.result.provider).toBe('backup');
+    // the breaker is open, so the dead provider is not called at all
+    expect(primary.chatCalls).toBe(callsAfterFirst);
+  });
+
+  it('does not count an open breaker against the provider that answers instead', async () => {
+    const primary = new ScriptedProvider({ name: 'primary', failures: 999 });
+    const backup = new ScriptedProvider({ name: 'backup' });
+    const router = new RouterService([primary, backup], config());
+
+    for (let i = 0; i < 5; i += 1) {
+      await router.chat(REQUEST);
+    }
+
+    const states = new Map(
+      router.breakerSnapshots().map((s) => [s.provider, s]),
+    );
+    expect(states.get('primary')?.state).toBe('open');
+    expect(states.get('backup')?.state).toBe('closed');
+    expect(states.get('backup')?.failures).toBe(0);
+  });
+
+  it('reports every provider in the breaker snapshot', () => {
+    const router = new RouterService(
+      [
+        new ScriptedProvider({ name: 'primary' }),
+        new ScriptedProvider({ name: 'backup' }),
+      ],
+      config(),
+    );
+
+    expect(router.breakerSnapshots().map((s) => s.provider)).toEqual([
+      'primary',
+      'backup',
     ]);
   });
 });

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import type { Response } from 'express';
 import { ProviderError } from '../../providers/provider.types';
+import { CircuitOpenError } from '../../router/circuit-breaker';
 
 @Catch(ProviderError)
 export class ProviderExceptionFilter implements ExceptionFilter<ProviderError> {
@@ -14,7 +15,11 @@ export class ProviderExceptionFilter implements ExceptionFilter<ProviderError> {
 
   catch(error: ProviderError, host: ArgumentsHost): void {
     const res = host.switchToHttp().getResponse<Response>();
-    const status = toGatewayStatus(error.status);
+    // declining to call is not the same as calling and getting a bad answer
+    const status =
+      error instanceof CircuitOpenError
+        ? HttpStatus.SERVICE_UNAVAILABLE
+        : toGatewayStatus(error.status);
 
     this.logger.error(
       `${error.provider} failed with ${error.status ?? 'no status'}: ${error.message}`,

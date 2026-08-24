@@ -14,6 +14,12 @@ import {
   ProviderError,
   TokenUsage,
 } from '../providers/provider.types';
+import {
+  BreakerPolicy,
+  BreakerSnapshot,
+  CircuitBreaker,
+  CircuitOpenError,
+} from './circuit-breaker';
 import { equivalentModels } from './model-equivalence';
 import { RetryPolicy, withRetry } from './retry';
 
@@ -73,10 +79,19 @@ const DEFAULTS: RetryPolicy = {
   maxDelayMs: 4_000,
 };
 
+const BREAKER_DEFAULTS: BreakerPolicy = {
+  failureRatio: 0.5,
+  minimumVolume: 10,
+  windowMs: 30_000,
+  openMs: 15_000,
+};
+
 @Injectable()
 export class RouterService {
   private readonly logger = new Logger(RouterService.name);
   private readonly policy: RetryPolicy;
+  private readonly breakerPolicy: BreakerPolicy;
+  private readonly breakers = new Map<string, CircuitBreaker>();
   private readonly fallbackByDefault: boolean;
 
   constructor(
@@ -100,6 +115,24 @@ export class RouterService {
         DEFAULTS.baseDelayMs,
       ),
       maxDelayMs: numberFrom(config, 'RETRY_MAX_DELAY_MS', DEFAULTS.maxDelayMs),
+    };
+    this.breakerPolicy = {
+      failureRatio: numberFrom(
+        config,
+        'BREAKER_FAILURE_RATIO',
+        BREAKER_DEFAULTS.failureRatio,
+      ),
+      minimumVolume: numberFrom(
+        config,
+        'BREAKER_MINIMUM_VOLUME',
+        BREAKER_DEFAULTS.minimumVolume,
+      ),
+      windowMs: numberFrom(
+        config,
+        'BREAKER_WINDOW_MS',
+        BREAKER_DEFAULTS.windowMs,
+      ),
+      openMs: numberFrom(config, 'BREAKER_OPEN_MS', BREAKER_DEFAULTS.openMs),
     };
     this.fallbackByDefault =
       config.get<string>('FALLBACK_ENABLED_BY_DEFAULT') !== 'false';
@@ -144,6 +177,15 @@ export class RouterService {
     );
 
     return [...exact, ...substitutes];
+  }
+
+  /**
+   * Current breaker state for every registered provider, for the health check.
+   */
+  breakerSnapshots(): BreakerSnapshot[] {
+    return this.providers.map((provider) =>
+      this.breakerFor(provider.name).snapshot(),
+    );
   }
 
   /**
@@ -268,14 +310,31 @@ export class RouterService {
     });
   }
 
+  private breakerFor(provider: string): CircuitBreaker {
+    let breaker = this.breakers.get(provider);
+    if (!breaker) {
+      breaker = new CircuitBreaker(provider, this.breakerPolicy);
+      this.breakers.set(provider, breaker);
+    }
+    return breaker;
+  }
+
   private runWithRetry<T>(
     target: RouteTarget,
     req: ChatRequest,
     attempts: AttemptRecord[],
     operation: () => Promise<T>,
   ): Promise<T> {
+    const breaker = this.breakerFor(target.provider.name);
+
     return withRetry(
       async () => {
+        // refusing here rather than inside the retry keeps a dead provider from
+        // burning the attempt budget that the next target needs
+        if (!breaker.tryAcquire()) {
+          throw new CircuitOpenError(target.provider.name);
+        }
+
         const attemptStartedAt = Date.now();
         const record: AttemptRecord = {
           attempt: attempts.length + 1,
@@ -289,9 +348,11 @@ export class RouterService {
         try {
           const value = await operation();
           record.status = 'success';
+          breaker.recordSuccess();
           return value;
         } catch (error) {
           record.error = describe(error);
+          breaker.recordFailure();
           throw error;
         } finally {
           record.latencyMs = Date.now() - attemptStartedAt;

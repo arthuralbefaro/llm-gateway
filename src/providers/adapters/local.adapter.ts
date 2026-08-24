@@ -46,6 +46,9 @@ export class LocalAdapter extends LlmProvider {
   private readonly latencyMs: number;
   private readonly failureRate: number;
   private readonly failureStatus: number;
+  private readonly failureFromMs: number;
+  private readonly failureUntilMs: number;
+  private readonly startedAt = Date.now();
 
   // a second instance under another name gives two providers serving the same
   // models, which is what makes fallback and the breaker demonstrable without
@@ -65,6 +68,15 @@ export class LocalAdapter extends LlmProvider {
     );
     this.failureStatus = Number(
       config.get<string>(`${prefix}_FAILURE_STATUS`) ?? DEFAULT_FAILURE_STATUS,
+    );
+    // a window relative to process start lets a provider die partway through a
+    // load test and recover on its own, which is what proves a breaker closes
+    this.failureFromMs = Number(
+      config.get<string>(`${prefix}_FAILURE_FROM_MS`) ?? 0,
+    );
+    this.failureUntilMs = Number(
+      config.get<string>(`${prefix}_FAILURE_UNTIL_MS`) ??
+        Number.MAX_SAFE_INTEGER,
     );
   }
 
@@ -141,6 +153,10 @@ export class LocalAdapter extends LlmProvider {
   }
 
   private maybeFail(): void {
+    const uptime = Date.now() - this.startedAt;
+    if (uptime < this.failureFromMs || uptime >= this.failureUntilMs) {
+      return;
+    }
     if (this.failureRate > 0 && Math.random() < this.failureRate) {
       throw new ProviderError(
         `injected failure with status ${this.failureStatus}`,
