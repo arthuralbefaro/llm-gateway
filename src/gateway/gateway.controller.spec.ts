@@ -16,6 +16,7 @@ import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import type { AuthenticatedRequest } from '../common/guards/api-key.guard';
 import { RequestLogService } from '../metrics/request-log.service';
 import { CacheService } from '../cache/cache.service';
+import type { CacheHit } from '../cache/cache.service';
 import { RateLimitGuard } from '../rate-limit/rate-limit.guard';
 import { MetricsService } from '../observability/metrics.service';
 import type { RequestRecord } from '../metrics/request-log.service';
@@ -113,9 +114,10 @@ describe('GatewayController', () => {
   const stored: string[] = [];
   const reads: string[] = [];
   const cache = {
-    lookup: () => {
-      reads.push('read');
-      return Promise.resolve(undefined);
+    hit: undefined as CacheHit | undefined,
+    lookup: (_req: unknown, opts: { semantic: boolean }) => {
+      reads.push(opts.semantic ? 'semantic' : 'exact');
+      return Promise.resolve(cache.hit);
     },
     store: (_req: unknown, response: string) => {
       stored.push(response);
@@ -272,7 +274,7 @@ describe('GatewayController', () => {
     stub.slow = false;
   });
 
-  it('reads the cache by default', async () => {
+  it('reads only the exact cache by default', async () => {
     await request(httpServer(app))
       .post('/v1/chat/completions')
       .send({
@@ -281,7 +283,75 @@ describe('GatewayController', () => {
       })
       .expect(201);
 
-    expect(reads).toEqual(['read']);
+    // semantic stays off unless asked for, a nearest neighbour is the wrong
+    // answer about half the time near the threshold and the gateway must not
+    // take that risk on the caller's behalf
+    expect(reads).toEqual(['exact']);
+  });
+
+  it('requests the semantic tier only on explicit opt in', async () => {
+    await request(httpServer(app))
+      .post('/v1/chat/completions')
+      .send({
+        model: 'stub-model',
+        messages: [{ role: 'user', content: 'hi' }],
+        cache: 'semantic',
+      })
+      .expect(201);
+
+    expect(reads).toEqual(['semantic']);
+  });
+
+  it('declares kind and similarity when a semantic hit is served', async () => {
+    cache.hit = {
+      response: 'stored answer',
+      kind: 'semantic',
+      similarity: 0.9612,
+    };
+
+    const res = await request(httpServer(app))
+      .post('/v1/chat/completions')
+      .send({
+        model: 'stub-model',
+        messages: [{ role: 'user', content: 'hi' }],
+        cache: 'semantic',
+      })
+      .expect(201);
+
+    cache.hit = undefined;
+    const payload = res.body as Record<string, unknown>;
+    expect(payload.cache_hit).toBe(true);
+    expect(payload.cache_kind).toBe('semantic');
+    expect(payload.cache_similarity).toBe(0.9612);
+  });
+
+  it('declares an exact hit without a similarity', async () => {
+    cache.hit = { response: 'stored answer', kind: 'exact', similarity: 1 };
+
+    const res = await request(httpServer(app))
+      .post('/v1/chat/completions')
+      .send({
+        model: 'stub-model',
+        messages: [{ role: 'user', content: 'hi' }],
+      })
+      .expect(201);
+
+    cache.hit = undefined;
+    const payload = res.body as Record<string, unknown>;
+    expect(payload.cache_hit).toBe(true);
+    expect(payload.cache_kind).toBe('exact');
+    expect(payload).not.toHaveProperty('cache_similarity');
+  });
+
+  it('rejects an unknown cache mode', async () => {
+    await request(httpServer(app))
+      .post('/v1/chat/completions')
+      .send({
+        model: 'stub-model',
+        messages: [{ role: 'user', content: 'hi' }],
+        cache: 'aggressive',
+      })
+      .expect(400);
   });
 
   it('skips reading the cache when the caller opts out, but still writes', async () => {

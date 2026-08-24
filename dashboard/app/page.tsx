@@ -82,7 +82,9 @@ export default async function Page() {
           Exact and semantic are separate lines because they are not the same
           product. The latency panel below is the reason: a semantic hit&apos;s
           tail sits close to an outright miss, so a combined hit rate would
-          suggest a speed it does not deliver.
+          suggest a speed it does not deliver. Semantic reads are opt-in per
+          request, so a near-zero semantic line is the default working as
+          designed, not a regression.
         </p>
         {unclassified > 0 && (
           <p className="warn">

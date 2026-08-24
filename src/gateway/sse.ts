@@ -14,10 +14,32 @@ function usagePayload(usage: TokenUsage): Record<string, number> {
   };
 }
 
+// a semantic hit is declared with its similarity so the caller knows the
+// answer came from a nearest neighbour, not from their exact prompt
+export interface CacheAnnotation {
+  kind: 'exact' | 'semantic';
+  similarity?: number;
+}
+
+function cacheFields(
+  cache: CacheAnnotation | undefined,
+): Record<string, unknown> {
+  if (!cache) {
+    return { cache_hit: false };
+  }
+  return {
+    cache_hit: true,
+    cache_kind: cache.kind,
+    ...(cache.similarity !== undefined
+      ? { cache_similarity: cache.similarity }
+      : {}),
+  };
+}
+
 export function completionPayload(
   id: string,
   result: ChatResult,
-  cacheHit: boolean,
+  cache: CacheAnnotation | undefined,
   requestedModel: string,
   usedFallback: boolean,
 ): Record<string, unknown> {
@@ -30,7 +52,7 @@ export function completionPayload(
     provider: result.provider,
     // never leave the caller assuming their first choice answered
     fallback: usedFallback,
-    cache_hit: cacheHit,
+    ...cacheFields(cache),
     choices: [
       {
         index: 0,
@@ -78,7 +100,7 @@ export function writeFinal(
   id: string,
   model: string,
   usage: TokenUsage,
-  cacheHit: boolean,
+  cache: CacheAnnotation | undefined,
   requestedModel: string,
   provider: string,
   usedFallback: boolean,
@@ -91,7 +113,7 @@ export function writeFinal(
     requested_model: requestedModel,
     provider,
     fallback: usedFallback,
-    cache_hit: cacheHit,
+    ...cacheFields(cache),
     choices: [{ index: 0, delta: {}, finish_reason: 'stop' }],
     usage: usagePayload(usage),
   });

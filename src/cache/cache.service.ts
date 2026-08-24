@@ -15,6 +15,10 @@ const DEFAULT_TTL_SECONDS = 60 * 60 * 24;
 
 export type CacheHitKind = 'exact' | 'semantic';
 
+export interface LookupOptions {
+  semantic: boolean;
+}
+
 export interface CacheHit {
   response: string;
   kind: CacheHitKind;
@@ -80,7 +84,14 @@ export class CacheService implements OnModuleDestroy {
     return (req.temperature ?? 0) === 0;
   }
 
-  async lookup(req: ChatRequest): Promise<CacheHit | undefined> {
+  // semantic is opt-in per request: similarity measures subject proximity, not
+  // answer equivalence, and precision falls as similarity rises inside the
+  // acceptance band (adr 0010), so the gateway must not take that risk for a
+  // caller who did not ask for it
+  async lookup(
+    req: ChatRequest,
+    opts: LookupOptions,
+  ): Promise<CacheHit | undefined> {
     if (!this.isCacheable(req)) {
       return undefined;
     }
@@ -89,7 +100,7 @@ export class CacheService implements OnModuleDestroy {
 
     return withSpan(
       'cache.lookup',
-      { 'llm.model': req.model },
+      { 'llm.model': req.model, 'cache.semantic_requested': opts.semantic },
       async (span) => {
         const exact = await withSpan(
           'cache.lookup.exact',
@@ -119,6 +130,12 @@ export class CacheService implements OnModuleDestroy {
           span.setAttribute('cache.kind', 'exact');
           this.metrics.recordCacheLookup('exact');
           return { response: exact, kind: 'exact', similarity: 1 };
+        }
+
+        if (!opts.semantic) {
+          span.setAttribute('cache.hit', false);
+          this.metrics.recordCacheLookup('miss');
+          return undefined;
         }
 
         const hit = await withSpan(

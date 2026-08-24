@@ -1,21 +1,36 @@
 {
   "uid": "llm-gateway",
   "title": "LLM Gateway",
-  "tags": ["llm-gateway"],
+  "tags": [
+    "llm-gateway"
+  ],
   "timezone": "browser",
   "schemaVersion": 39,
   "version": 1,
   "refresh": "10s",
-  "time": { "from": "now-15m", "to": "now" },
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
   "panels": [
     {
       "id": 1,
       "type": "timeseries",
       "title": "Request rate by cache outcome",
-      "description": "Requests per second, split by whether the answer came from the exact cache, the semantic cache, a provider, or a caller who opted out of the cache.",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "description": "Requests per second, split by whether the answer came from the exact cache, the semantic cache, a provider, or a caller who opted out of the cache. Semantic reads are opt-in per request since the week 6 decision, so a semantic volume near zero is the default behaving as designed.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
       "fieldConfig": {
-        "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } },
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "fillOpacity": 20
+          }
+        },
         "overrides": []
       },
       "targets": [
@@ -30,10 +45,20 @@
       "id": 2,
       "type": "timeseries",
       "title": "Latency percentiles by cache outcome",
-      "description": "A cache moves the median and barely moves the tail, because the misses that remain are what p95 and p99 measure. Both are shown so the dashboard cannot imply otherwise.",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "description": "A cache moves the median and barely moves the tail, because the misses that remain are what p95 and p99 measure. Both are shown so the dashboard cannot imply otherwise. Semantic reads are opt-in per request since the week 6 decision, so a semantic volume near zero is the default behaving as designed.",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
       "fieldConfig": {
-        "defaults": { "unit": "s", "custom": { "fillOpacity": 0 } },
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "fillOpacity": 0
+          }
+        },
         "overrides": []
       },
       "targets": [
@@ -58,8 +83,13 @@
       "id": 3,
       "type": "stat",
       "title": "Cache hit rate",
-      "description": "Exact and semantic hits over all lookups in the window.",
-      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 8 },
+      "description": "Exact and semantic hits over all lookups in the window. Semantic reads are opt-in per request since the week 6 decision, so a semantic volume near zero is the default behaving as designed.",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 8
+      },
       "fieldConfig": {
         "defaults": {
           "unit": "percentunit",
@@ -68,9 +98,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "orange", "value": 0.3 },
-              { "color": "green", "value": 0.6 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.3
+              },
+              {
+                "color": "green",
+                "value": 0.6
+              }
             ]
           }
         },
@@ -88,10 +127,23 @@
       "id": 4,
       "type": "timeseries",
       "title": "Cache lookups, exact against semantic",
-      "description": "Kept separate because they cost two orders of magnitude apart: a redis key lookup against a vector search.",
-      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 8 },
+      "description": "Kept separate because they cost two orders of magnitude apart: a redis key lookup against a vector search. Semantic reads are opt-in per request since the week 6 decision, so a semantic volume near zero is the default behaving as designed.",
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 8
+      },
       "fieldConfig": {
-        "defaults": { "unit": "reqps", "custom": { "fillOpacity": 30, "stacking": { "mode": "normal" } } },
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "fillOpacity": 30,
+            "stacking": {
+              "mode": "normal"
+            }
+          }
+        },
         "overrides": []
       },
       "targets": [
@@ -107,9 +159,19 @@
       "type": "timeseries",
       "title": "Cost by provider and model",
       "description": "Confirmed and estimated cost are separate series. Estimated cost comes from a stream that died after emitting text, where the provider billed for output it never reported.",
-      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 8 },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
       "fieldConfig": {
-        "defaults": { "unit": "currencyUSD", "custom": { "fillOpacity": 20 } },
+        "defaults": {
+          "unit": "currencyUSD",
+          "custom": {
+            "fillOpacity": 20
+          }
+        },
         "overrides": []
       },
       "targets": [
@@ -125,9 +187,19 @@
       "type": "timeseries",
       "title": "Provider attempts by outcome",
       "description": "Counts every attempt, not only the one that answered, so a provider failing behind a working fallback is still visible.",
-      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 14 },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 0,
+        "y": 14
+      },
       "fieldConfig": {
-        "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } },
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "fillOpacity": 20
+          }
+        },
         "overrides": []
       },
       "targets": [
@@ -143,12 +215,20 @@
       "type": "timeseries",
       "title": "Circuit breaker state",
       "description": "0 closed, 1 half open, 2 open.",
-      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 14 },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 8,
+        "y": 14
+      },
       "fieldConfig": {
         "defaults": {
           "min": 0,
           "max": 2,
-          "custom": { "fillOpacity": 30, "lineInterpolation": "stepAfter" }
+          "custom": {
+            "fillOpacity": 30,
+            "lineInterpolation": "stepAfter"
+          }
         },
         "overrides": []
       },
@@ -165,9 +245,18 @@
       "type": "timeseries",
       "title": "Embedding queue and refusals",
       "description": "The queue is bounded on purpose. Under overload a refused embedding skips the cache write rather than growing the backlog, so refusals rising while availability holds is the design working.",
-      "gridPos": { "h": 7, "w": 8, "x": 16, "y": 14 },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 16,
+        "y": 14
+      },
       "fieldConfig": {
-        "defaults": { "custom": { "fillOpacity": 20 } },
+        "defaults": {
+          "custom": {
+            "fillOpacity": 20
+          }
+        },
         "overrides": []
       },
       "targets": [
@@ -192,9 +281,19 @@
       "id": 9,
       "type": "timeseries",
       "title": "Rate limited and fallbacks",
-      "gridPos": { "h": 6, "w": 12, "x": 0, "y": 21 },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 0,
+        "y": 21
+      },
       "fieldConfig": {
-        "defaults": { "unit": "reqps", "custom": { "fillOpacity": 20 } },
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "fillOpacity": 20
+          }
+        },
         "overrides": []
       },
       "targets": [
@@ -214,9 +313,18 @@
       "id": 10,
       "type": "timeseries",
       "title": "Tokens by provider and model",
-      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 21 },
+      "gridPos": {
+        "h": 6,
+        "w": 12,
+        "x": 12,
+        "y": 21
+      },
       "fieldConfig": {
-        "defaults": { "custom": { "fillOpacity": 20 } },
+        "defaults": {
+          "custom": {
+            "fillOpacity": 20
+          }
+        },
         "overrides": []
       },
       "targets": [

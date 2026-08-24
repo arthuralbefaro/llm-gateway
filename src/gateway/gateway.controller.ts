@@ -20,6 +20,7 @@ import { currentSpan, withSpan } from '../tracing/span';
 import type { ServedTarget } from '../router/router.service';
 import { chatCompletionSchema } from './dto/chat-completion.schema';
 import type { ChatCompletionBody } from './dto/chat-completion.schema';
+import type { CacheAnnotation } from './sse';
 import {
   chunkText,
   completionId,
@@ -76,6 +77,7 @@ export class GatewayController {
           'llm.requested_model': body.model,
           'llm.stream': body.stream,
           'llm.cache_requested': body.cache !== false,
+          'llm.cache_semantic_requested': body.cache === 'semantic',
         },
         () =>
           body.stream
@@ -123,7 +125,7 @@ export class GatewayController {
               model: body.model,
               provider: CACHE_PROVIDER,
             },
-            true,
+            annotationOf(hit),
             body.model,
             false,
           ),
@@ -178,7 +180,7 @@ export class GatewayController {
         completionPayload(
           completionId(),
           routed.result,
-          false,
+          undefined,
           body.model,
           routed.usedFallback,
         ),
@@ -235,7 +237,7 @@ export class GatewayController {
         id,
         body.model,
         NO_USAGE,
-        true,
+        annotationOf(hit),
         body.model,
         CACHE_PROVIDER,
         false,
@@ -325,7 +327,7 @@ export class GatewayController {
             id,
             served.model,
             chunk.usage ?? NO_USAGE,
-            false,
+            undefined,
             body.model,
             served.provider,
             served.usedFallback,
@@ -375,7 +377,8 @@ export class GatewayController {
   }
 
   // reading is what the caller opted out of, writing still happens so the next
-  // caller benefits from the answer this one paid for
+  // caller benefits from the answer this one paid for. semantic reads need the
+  // opposite consent: they only happen when explicitly requested (adr 0010)
   private lookup(
     body: ChatCompletionBody,
     req: ChatRequest,
@@ -383,7 +386,7 @@ export class GatewayController {
     if (body.cache === false) {
       return Promise.resolve(undefined);
     }
-    return this.cache.lookup(req);
+    return this.cache.lookup(req, { semantic: body.cache === 'semantic' });
   }
 
   private logCacheHit(kind: string, model: string, similarity: number): void {
@@ -475,6 +478,14 @@ export class GatewayController {
       maxTokens: body.max_tokens,
     };
   }
+}
+
+// exact means the stored prompt is this prompt, similarity would be noise, a
+// semantic hit reports how near its neighbour actually was
+function annotationOf(hit: CacheHit): CacheAnnotation {
+  return hit.kind === 'semantic'
+    ? { kind: hit.kind, similarity: hit.similarity }
+    : { kind: hit.kind };
 }
 
 // rough on purpose, real tokenizers land near four characters per token and a
