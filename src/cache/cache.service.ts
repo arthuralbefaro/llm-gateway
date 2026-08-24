@@ -164,7 +164,13 @@ export class CacheService implements OnModuleDestroy {
       WHERE "id" = ${nearest.id}
     `);
 
-    await this.setExact(model, prompt, nearest.id, nearest.response);
+    // writing back to redis is an optimisation for the next caller, so it must
+    // not be able to discard a hit postgres already found
+    await this.setExact(model, prompt, nearest.id, nearest.response).catch(
+      (error: unknown) => {
+        this.logger.warn(`exact key not refreshed: ${describe(error)}`);
+      },
+    );
 
     return {
       response: nearest.response,

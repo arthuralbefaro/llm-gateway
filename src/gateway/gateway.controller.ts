@@ -1,6 +1,7 @@
 import { Body, Controller, Logger, Post, Res, UseGuards } from '@nestjs/common';
 import type { Response } from 'express';
 import { CacheService } from '../cache/cache.service';
+import type { CacheHit } from '../cache/cache.service';
 import { ApiKeyId } from '../common/decorators/api-key-id.decorator';
 import { ApiKeyGuard } from '../common/guards/api-key.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
@@ -64,7 +65,7 @@ export class GatewayController {
     const startedAt = Date.now();
 
     try {
-      const hit = await this.cache.lookup(req);
+      const hit = await this.lookup(body, req);
       if (hit) {
         this.logCacheHit(hit.kind, body.model, hit.similarity);
         this.recordHit(apiKeyId, body.model, Date.now() - startedAt);
@@ -141,7 +142,7 @@ export class GatewayController {
     const startedAt = Date.now();
     const id = completionId();
 
-    const hit = await this.cache.lookup(req);
+    const hit = await this.lookup(body, req);
     if (hit) {
       this.logCacheHit(hit.kind, body.model, hit.similarity);
       this.recordHit(apiKeyId, body.model, Date.now() - startedAt);
@@ -272,6 +273,18 @@ export class GatewayController {
 
     writeDone(res);
     res.end();
+  }
+
+  // reading is what the caller opted out of, writing still happens so the next
+  // caller benefits from the answer this one paid for
+  private lookup(
+    body: ChatCompletionBody,
+    req: ChatRequest,
+  ): Promise<CacheHit | undefined> {
+    if (body.cache === false) {
+      return Promise.resolve(undefined);
+    }
+    return this.cache.lookup(req);
   }
 
   private logCacheHit(kind: string, model: string, similarity: number): void {

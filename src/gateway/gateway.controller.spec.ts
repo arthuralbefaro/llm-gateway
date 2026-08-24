@@ -110,8 +110,12 @@ describe('GatewayController', () => {
     },
   };
   const stored: string[] = [];
+  const reads: string[] = [];
   const cache = {
-    lookup: () => Promise.resolve(undefined),
+    lookup: () => {
+      reads.push('read');
+      return Promise.resolve(undefined);
+    },
     store: (_req: unknown, response: string) => {
       stored.push(response);
       return Promise.resolve();
@@ -152,6 +156,7 @@ describe('GatewayController', () => {
   beforeEach(() => {
     recorded.length = 0;
     stored.length = 0;
+    reads.length = 0;
   });
 
   it('returns json when stream is false', async () => {
@@ -262,6 +267,33 @@ describe('GatewayController', () => {
     await new Promise((resolve) => setTimeout(resolve, 300));
     expect(stub.lastSignal?.aborted).toBe(true);
     stub.slow = false;
+  });
+
+  it('reads the cache by default', async () => {
+    await request(httpServer(app))
+      .post('/v1/chat/completions')
+      .send({
+        model: 'stub-model',
+        messages: [{ role: 'user', content: 'hi' }],
+      })
+      .expect(201);
+
+    expect(reads).toEqual(['read']);
+  });
+
+  it('skips reading the cache when the caller opts out, but still writes', async () => {
+    await request(httpServer(app))
+      .post('/v1/chat/completions')
+      .send({
+        model: 'stub-model',
+        messages: [{ role: 'user', content: 'hi' }],
+        cache: false,
+      })
+      .expect(201);
+
+    // wanting a fresh answer is not a reason to deny it to the next caller
+    expect(reads).toEqual([]);
+    expect(stored).toEqual(['Hello there']);
   });
 
   it('rejects a model no provider supports', async () => {

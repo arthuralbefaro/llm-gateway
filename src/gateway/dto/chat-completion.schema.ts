@@ -14,6 +14,9 @@ export const chatCompletionSchema = z.object({
   // opt out per request, a caller who benchmarked one model may prefer an
   // error over a different model's answer
   fallback: z.boolean().optional(),
+  // false skips reading the cache but still writes the answer, since wanting a
+  // fresh answer is not a reason to deny it to everybody else
+  cache: z.boolean().optional(),
 });
 
 export type ChatCompletionBody = z.infer<typeof chatCompletionSchema>;
