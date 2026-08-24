@@ -1,0 +1,11 @@
+[
+  "What is the capital of France?",
+  "Qual e a capital da Franca?",
+  "Qual é a capital da França?",
+  "explain the main mechanism behind photosynthesis in desert plants",
+  "escreva um haicai sobre o mar",
+  "",
+  "a",
+  "Uma frase com acentuação, cedilha e til: coordenação, maçã, irmão.",
+  "A much longer prompt that runs past the short inputs above, so the comparison covers a sequence long enough to exercise padding and the attention mask rather than only trivially short ones."
+]

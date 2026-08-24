@@ -63,4 +63,8 @@ src/generated
 # local model cache for the embedding service
 .models
 
-docs/
+# python evaluation suite
+evals/.venv
+evals/**/__pycache__
+evals/.pytest_cache
+evals/.ruff_cache

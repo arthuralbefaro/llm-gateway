@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "note": "hand authored source material, expanded into pairs by scripts/build_dataset.py. each topic carries four forms per language: the base question, a paraphrase that must hit, a sibling question on the same topic that must not, and a minimal edit that changes the answer while barely changing the words.",
+  "topics": [
+    {
+      "id": "coffee-rust",
+      "minimal_kind": "entity",
+      "en": {
+        "base": "What causes coffee leaf rust to spread so quickly in wet seasons?",
+        "paraphrase": "Why does coffee leaf rust spread so fast when the weather is wet?",
+        "sibling": "Which coffee varieties have been bred to resist leaf rust?",
+        "minimal": "What causes coffee berry borer to spread so quickly in wet seasons?"
+      },
+      "pt": {
+        "base": "O que faz a ferrugem do cafeeiro se espalhar tão rápido na estação chuvosa?",
+        "paraphrase": "Por que a ferrugem do café se alastra tão depressa quando chove muito?",
+        "sibling": "Quais variedades de café foram desenvolvidas para resistir à ferrugem?",
+        "minimal": "O que faz a broca do café se espalhar tão rápido na estação chuvosa?"
+      }
+    },
+    {
+      "id": "suspension-bridge",
+      "minimal_kind": "negation",
+      "en": {
+        "base": "How does a suspension bridge carry load through its main cables?",
+        "paraphrase": "In what way do the main cables of a suspension bridge bear the load?",
+        "sibling": "How are the towers of a suspension bridge anchored into bedrock?",
+        "minimal": "How does a suspension bridge carry load without using its main cables?"
+      },
+      "pt": {
+        "base": "Como uma ponte pênsil transfere carga pelos cabos principais?",
+        "paraphrase": "De que forma os cabos principais de uma ponte pênsil sustentam a carga?",
+        "sibling": "Como as torres de uma ponte pênsil são ancoradas na rocha?",
+        "minimal": "Como uma ponte pênsil transfere carga sem usar os cabos principais?"
+      }
+    },
+    {
+      "id": "sourdough",
+      "minimal_kind": "temporal",
+      "en": {
+        "base": "What happens inside a sourdough starter during the first week?",
+        "paraphrase": "What is going on in a sourdough starter over its first seven days?",
+        "sibling": "How do you tell whether a sourdough starter has gone bad?",
+        "minimal": "What happens inside a sourdough starter after the first year?"
+      },
+      "pt": {
+        "base": "O que acontece dentro de um fermento natural durante a primeira semana?",
+        "paraphrase": "O que se passa num fermento natural ao longo dos sete primeiros dias?",
+        "sibling": "Como saber se um fermento natural estragou?",
+        "minimal": "O que acontece dentro de um fermento natural depois do primeiro ano?"
+      }
+    },
+    {
+      "id": "tidal-locking",
+      "minimal_kind": "entity",
+      "en": {
+        "base": "Why is the Moon tidally locked to the Earth?",
+        "paraphrase": "What made the Moon end up tidally locked with the Earth?",
+        "sibling": "How long did tidal locking take to happen for the Moon?",
+        "minimal": "Why is Mercury tidally locked to the Sun?"
+      },
+      "pt": {
+        "base": "Por que a Lua está em rotação sincronizada com a Terra?",
+        "paraphrase": "O que fez a Lua acabar com a rotação sincronizada à Terra?",
+        "sibling": "Quanto tempo levou para a Lua entrar em rotação sincronizada?",
+        "minimal": "Por que Mercúrio está em rotação sincronizada com o Sol?"
+      }
+    },
+    {
+      "id": "antibiotic-resistance",
+      "minimal_kind": "negation",
+      "en": {
+        "base": "How does antibiotic resistance spread between bacteria in a hospital?",
+        "paraphrase": "By what routes does resistance to antibiotics move among hospital bacteria?",
+        "sibling": "Which antibiotics are held in reserve for resistant infections?",
+        "minimal": "How does antibiotic resistance fail to spread between bacteria in a hospital?"
+      },
+      "pt": {
+        "base": "Como a resistência a antibióticos se espalha entre bactérias num hospital?",
+        "paraphrase": "Por quais vias a resistência a antibióticos passa de uma bactéria a outra no hospital?",
+        "sibling": "Quais antibióticos são reservados para infecções resistentes?",
+        "minimal": "Por que a resistência a antibióticos não se espalha entre bactérias num hospital?"
+      }
+    },
+    {
+      "id": "shipping-container",
+      "minimal_kind": "temporal",
+      "en": {
+        "base": "How did the shipping container change port labour in the 1960s?",
+        "paraphrase": "What did containerisation do to dock work during the 1960s?",
+        "sibling": "Who set the standard dimensions for the shipping container?",
+        "minimal": "How did the shipping container change port labour in the 2010s?"
+      },
+      "pt": {
+        "base": "Como o contêiner mudou o trabalho portuário nos anos 1960?",
+        "paraphrase": "O que a conteinerização fez com o trabalho nas docas durante os anos 1960?",
+        "sibling": "Quem definiu as dimensões padrão do contêiner de carga?",
+        "minimal": "Como o contêiner mudou o trabalho portuário nos anos 2010?"
+      }
+    },
+    {
+      "id": "coral-bleaching",
+      "minimal_kind": "entity",
+      "en": {
+        "base": "At what temperature does coral start to bleach?",
+        "paraphrase": "How warm does the water have to get before coral bleaches?",
+        "sibling": "Can a bleached reef recover once the water cools again?",
+        "minimal": "At what temperature does kelp start to die off?"
+      },
+      "pt": {
+        "base": "A partir de que temperatura o coral começa a branquear?",
+        "paraphrase": "Quão quente a água precisa ficar para o coral branquear?",
+        "sibling": "Um recife branqueado consegue se recuperar quando a água esfria?",
+        "minimal": "A partir de que temperatura as algas kelp começam a morrer?"
+      }
+    },
+    {
+      "id": "rent-control",
+      "minimal_kind": "negation",
+      "en": {
+        "base": "What does rent control do to the supply of rental housing?",
+        "paraphrase": "How does capping rents affect how much rental housing gets built?",
+        "sibling": "Which cities have repealed rent control and why?",
+        "minimal": "What does removing rent control do to the supply of rental housing?"
+      },
+      "pt": {
+        "base": "O que o controle de aluguéis faz com a oferta de imóveis para locação?",
+        "paraphrase": "Como limitar aluguéis afeta a quantidade de imóveis colocados para alugar?",
+        "sibling": "Quais cidades revogaram o controle de aluguéis e por quê?",
+        "minimal": "O que retirar o controle de aluguéis faz com a oferta de imóveis para locação?"
+      }
+    },
+    {
+      "id": "nitrogen-fixation",
+      "minimal_kind": "entity",
+      "en": {
+        "base": "How do legumes fix nitrogen with root bacteria?",
+        "paraphrase": "In what way do bacteria in legume roots capture nitrogen?",
+        "sibling": "How much nitrogen does a clover cover crop leave in the soil?",
+        "minimal": "How do legumes take up phosphorus with root fungi?"
+      },
+      "pt": {
+        "base": "Como as leguminosas fixam nitrogênio com bactérias nas raízes?",
+        "paraphrase": "De que maneira as bactérias das raízes de leguminosas capturam nitrogênio?",
+        "sibling": "Quanto nitrogênio uma cobertura de trevo deixa no solo?",
+        "minimal": "Como as leguminosas absorvem fósforo com fungos nas raízes?"
+      }
+    },
+    {
+      "id": "error-correction",
+      "minimal_kind": "entity",
+      "en": {
+        "base": "How do error correcting codes recover data from a failed drive?",
+        "paraphrase": "In what way does error correction rebuild data when a drive dies?",
+        "sibling": "How much storage overhead does erasure coding cost?",
+        "minimal": "How do checksums detect data corruption on a failed drive?"
+      },
+      "pt": {
+        "base": "Como os códigos corretores de erro recuperam dados de um disco que falhou?",
+        "paraphrase": "De que forma a correção de erros reconstrói dados quando um disco morre?",
+        "sibling": "Quanto espaço extra o erasure coding custa em armazenamento?",
+        "minimal": "Como os checksums detectam corrupção de dados num disco que falhou?"
+      }
+    },
+    {
+      "id": "arctic-tern",
+      "minimal_kind": "entity",
+      "en": {
+        "base": "How does the Arctic tern navigate on its yearly migration?",
+        "paraphrase": "What does the Arctic tern use to find its way each year when it migrates?",
+        "sibling": "How far does an Arctic tern travel in a single migration?",
+        "minimal": "How does the monarch butterfly navigate on its yearly migration?"
+      },
+      "pt": {
+        "base": "Como a andorinha-do-ártico se orienta na migração anual?",
+        "paraphrase": "O que a andorinha-do-ártico usa para achar o caminho a cada migração?",
+        "sibling": "Que distância uma andorinha-do-ártico percorre numa única migração?",
+        "minimal": "Como a borboleta-monarca se orienta na migração anual?"
+      }
+    },
+    {
+      "id": "reverse-osmosis",
+      "minimal_kind": "negation",
+      "en": {
+        "base": "Why does reverse osmosis need high pressure to desalinate water?",
+        "paraphrase": "What makes high pressure necessary for desalination by reverse osmosis?",
+        "sibling": "What happens to the brine left over from reverse osmosis?",
+        "minimal": "Why does reverse osmosis work without high pressure to desalinate water?"
+      },
+      "pt": {
+        "base": "Por que a osmose reversa precisa de alta pressão para dessalinizar água?",
+        "paraphrase": "O que torna a alta pressão necessária na dessalinização por osmose reversa?",
+        "sibling": "O que acontece com a salmoura que sobra da osmose reversa?",
+        "minimal": "Por que a osmose reversa funciona sem alta pressão para dessalinizar água?"
+      }
+    },
+    {
+      "id": "urban-heat",
+      "minimal_kind": "temporal",
+      "en": {
+        "base": "Why are cities hotter than the countryside at night?",
+        "paraphrase": "What makes urban areas warmer than rural ones after dark?",
+        "sibling": "Which building materials worsen the urban heat island effect?",
+        "minimal": "Why are cities hotter than the countryside at midday?"
+      },
+      "pt": {
+        "base": "Por que as cidades são mais quentes que o campo à noite?",
+        "paraphrase": "O que faz as áreas urbanas ficarem mais quentes que as rurais depois do anoitecer?",
+        "sibling": "Quais materiais de construção agravam a ilha de calor urbana?",
+        "minimal": "Por que as cidades são mais quentes que o campo ao meio-dia?"
+      }
+    },
+    {
+      "id": "mycorrhizal",
+      "minimal_kind": "entity",
+      "en": {
+        "base": "How do mycorrhizal networks move nutrients between trees?",
+        "paraphrase": "In what way do fungal networks carry nutrients from tree to tree?",
+        "sibling": "Do mycorrhizal networks also transmit stress signals?",
+        "minimal": "How do root grafts move nutrients between trees?"
+      },
+      "pt": {
+        "base": "Como as redes micorrízicas movem nutrientes entre árvores?",
+        "paraphrase": "De que forma as redes de fungos transportam nutrientes de uma árvore a outra?",
+        "sibling": "As redes micorrízicas também transmitem sinais de estresse?",
+        "minimal": "Como os enxertos de raiz movem nutrientes entre árvores?"
+      }
+    },
+    {
+      "id": "concert-hall",
+      "minimal_kind": "negation",
+      "en": {
+        "base": "What makes a concert hall sound good for orchestral music?",
+        "paraphrase": "Which qualities give a concert hall good acoustics for an orchestra?",
+        "sibling": "How is reverberation time measured in a concert hall?",
+        "minimal": "What makes a concert hall sound bad for orchestral music?"
+      },
+      "pt": {
+        "base": "O que faz uma sala de concertos soar bem para música orquestral?",
+        "paraphrase": "Quais qualidades dão a uma sala de concertos boa acústica para orquestra?",
+        "sibling": "Como o tempo de reverberação é medido numa sala de concertos?",
+        "minimal": "O que faz uma sala de concertos soar mal para música orquestral?"
+      }
+    },
+    {
+      "id": "lithium-brine",
+      "minimal_kind": "entity",
+      "en": {
+        "base": "How is lithium extracted from salt flat brine?",
+        "paraphrase": "What is the process for getting lithium out of brine in a salt flat?",
+        "sibling": "How much water does lithium brine extraction consume?",
+        "minimal": "How is potash extracted from salt flat brine?"
+      },
+      "pt": {
+        "base": "Como o lítio é extraído da salmoura de salares?",
+        "paraphrase": "Qual é o processo para obter lítio a partir da salmoura de um salar?",
+        "sibling": "Quanta água a extração de lítio em salmoura consome?",
+        "minimal": "Como a potassa é extraída da salmoura de salares?"
+      }
+    },
+    {
+      "id": "printing-press",
+      "minimal_kind": "temporal",
+      "en": {
+        "base": "How did the printing press change literacy in the fifteenth century?",
+        "paraphrase": "What did movable type do to reading rates during the fifteenth century?",
+        "sibling": "Who financed the earliest printing houses in Europe?",
+        "minimal": "How did the printing press change literacy in the nineteenth century?"
+      },
+      "pt": {
+        "base": "Como a imprensa mudou a alfabetização no século quinze?",
+        "paraphrase": "O que os tipos móveis fizeram com as taxas de leitura durante o século quinze?",
+        "sibling": "Quem financiou as primeiras tipografias da Europa?",
+        "minimal": "Como a imprensa mudou a alfabetização no século dezenove?"
+      }
+    },
+    {
+      "id": "circadian-plants",
+      "minimal_kind": "entity",
+      "en": {
+        "base": "How do plants keep circadian rhythm without a nervous system?",
+        "paraphrase": "By what means do plants hold a daily rhythm despite having no nerves?",
+        "sibling": "What happens to a plant kept in constant light for weeks?",
+        "minimal": "How do fungi keep circadian rhythm without a nervous system?"
+      },
+      "pt": {
+        "base": "Como as plantas mantêm ritmo circadiano sem sistema nervoso?",
+        "paraphrase": "Por quais meios as plantas sustentam um ritmo diário mesmo sem nervos?",
+        "sibling": "O que acontece com uma planta mantida em luz constante por semanas?",
+        "minimal": "Como os fungos mantêm ritmo circadiano sem sistema nervoso?"
+      }
+    },
+    {
+      "id": "railway-gauge",
+      "minimal_kind": "negation",
+      "en": {
+        "base": "Why did railways standardise on a single track gauge?",
+        "paraphrase": "What drove railways to settle on one common gauge for track?",
+        "sibling": "Which countries still run on a gauge different from the standard?",
+        "minimal": "Why did railways refuse to standardise on a single track gauge?"
+      },
+      "pt": {
+        "base": "Por que as ferrovias padronizaram uma única bitola?",
+        "paraphrase": "O que levou as ferrovias a adotar uma bitola comum para os trilhos?",
+        "sibling": "Quais países ainda operam com bitola diferente da padrão?",
+        "minimal": "Por que as ferrovias se recusaram a padronizar uma única bitola?"
+      }
+    },
+    {
+      "id": "peat-bog",
+      "minimal_kind": "entity",
+      "en": {
+        "base": "Why do peat bogs preserve human remains so well?",
+        "paraphrase": "What is it about peat bogs that keeps human bodies intact for so long?",
+        "sibling": "How are bog bodies dated once they are found?",
+        "minimal": "Why do salt mines preserve human remains so well?"
+      },
+      "pt": {
+        "base": "Por que os pântanos de turfa preservam tão bem restos humanos?",
+        "paraphrase": "O que os pântanos de turfa têm que mantém corpos humanos íntegros por tanto tempo?",
+        "sibling": "Como os corpos encontrados em turfeiras são datados?",
+        "minimal": "Por que as minas de sal preservam tão bem restos humanos?"
+      }
+    }
+  ]
+}

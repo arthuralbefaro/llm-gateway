@@ -1,0 +1,2878 @@
+{
+  "contract_version": 1,
+  "provenance": {
+    "model": "Xenova/multilingual-e5-small",
+    "dtype": "q8",
+    "runtime": "@huggingface/transformers on onnxruntime-node",
+    "runtime_version": "transformers 4.2.0, onnxruntime-node 1.24.3, node v24.19.0",
+    "graph_optimization": "unspecified by caller, onnxruntime-node default",
+    "prefix": "query: ",
+    "pooling": "mean",
+    "normalized": true,
+    "generated_at": "2026-08-24T19:08:00.707Z",
+    "dataset_version": 1,
+    "dataset_sha256": "2820bb5f5c0f605568186e1485006d0d57ef842c7e6f47b12e2d473ff92a6d5d"
+  },
+  "rows": [
+    {
+      "pair": {
+        "id": "paraphrase-coffee-rust-en",
+        "category": "paraphrase",
+        "left": "What causes coffee leaf rust to spread so quickly in wet seasons?",
+        "right": "Why does coffee leaf rust spread so fast when the weather is wet?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "coffee-rust",
+        "note": ""
+      },
+      "similarity": 0.9784005528320214
+    },
+    {
+      "pair": {
+        "id": "same_topic-coffee-rust-en",
+        "category": "same_topic",
+        "left": "What causes coffee leaf rust to spread so quickly in wet seasons?",
+        "right": "Which coffee varieties have been bred to resist leaf rust?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "coffee-rust",
+        "note": ""
+      },
+      "similarity": 0.9003947032452616
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-coffee-rust-en",
+        "category": "minimal_pair",
+        "left": "What causes coffee leaf rust to spread so quickly in wet seasons?",
+        "right": "What causes coffee berry borer to spread so quickly in wet seasons?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "coffee-rust",
+        "note": "entity"
+      },
+      "similarity": 0.9535319825681464
+    },
+    {
+      "pair": {
+        "id": "paraphrase-coffee-rust-pt",
+        "category": "paraphrase",
+        "left": "O que faz a ferrugem do cafeeiro se espalhar tão rápido na estação chuvosa?",
+        "right": "Por que a ferrugem do café se alastra tão depressa quando chove muito?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "coffee-rust",
+        "note": ""
+      },
+      "similarity": 0.9386601825551228
+    },
+    {
+      "pair": {
+        "id": "same_topic-coffee-rust-pt",
+        "category": "same_topic",
+        "left": "O que faz a ferrugem do cafeeiro se espalhar tão rápido na estação chuvosa?",
+        "right": "Quais variedades de café foram desenvolvidas para resistir à ferrugem?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "coffee-rust",
+        "note": ""
+      },
+      "similarity": 0.892908307788752
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-coffee-rust-pt",
+        "category": "minimal_pair",
+        "left": "O que faz a ferrugem do cafeeiro se espalhar tão rápido na estação chuvosa?",
+        "right": "O que faz a broca do café se espalhar tão rápido na estação chuvosa?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "coffee-rust",
+        "note": "entity"
+      },
+      "similarity": 0.9601619497941506
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-coffee-rust-base",
+        "category": "cross_lingual",
+        "left": "What causes coffee leaf rust to spread so quickly in wet seasons?",
+        "right": "O que faz a ferrugem do cafeeiro se espalhar tão rápido na estação chuvosa?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "coffee-rust",
+        "note": "base"
+      },
+      "similarity": 0.8750458964650935
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-coffee-rust-paraphrase",
+        "category": "cross_lingual",
+        "left": "Why does coffee leaf rust spread so fast when the weather is wet?",
+        "right": "Por que a ferrugem do café se alastra tão depressa quando chove muito?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "coffee-rust",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8486393097763739
+    },
+    {
+      "pair": {
+        "id": "paraphrase-suspension-bridge-en",
+        "category": "paraphrase",
+        "left": "How does a suspension bridge carry load through its main cables?",
+        "right": "In what way do the main cables of a suspension bridge bear the load?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "suspension-bridge",
+        "note": ""
+      },
+      "similarity": 0.9617962111260148
+    },
+    {
+      "pair": {
+        "id": "same_topic-suspension-bridge-en",
+        "category": "same_topic",
+        "left": "How does a suspension bridge carry load through its main cables?",
+        "right": "How are the towers of a suspension bridge anchored into bedrock?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "suspension-bridge",
+        "note": ""
+      },
+      "similarity": 0.8961341117876371
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-suspension-bridge-en",
+        "category": "minimal_pair",
+        "left": "How does a suspension bridge carry load through its main cables?",
+        "right": "How does a suspension bridge carry load without using its main cables?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "suspension-bridge",
+        "note": "negation"
+      },
+      "similarity": 0.9856340556517893
+    },
+    {
+      "pair": {
+        "id": "paraphrase-suspension-bridge-pt",
+        "category": "paraphrase",
+        "left": "Como uma ponte pênsil transfere carga pelos cabos principais?",
+        "right": "De que forma os cabos principais de uma ponte pênsil sustentam a carga?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "suspension-bridge",
+        "note": ""
+      },
+      "similarity": 0.9654419935435818
+    },
+    {
+      "pair": {
+        "id": "same_topic-suspension-bridge-pt",
+        "category": "same_topic",
+        "left": "Como uma ponte pênsil transfere carga pelos cabos principais?",
+        "right": "Como as torres de uma ponte pênsil são ancoradas na rocha?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "suspension-bridge",
+        "note": ""
+      },
+      "similarity": 0.9015165746738039
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-suspension-bridge-pt",
+        "category": "minimal_pair",
+        "left": "Como uma ponte pênsil transfere carga pelos cabos principais?",
+        "right": "Como uma ponte pênsil transfere carga sem usar os cabos principais?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "suspension-bridge",
+        "note": "negation"
+      },
+      "similarity": 0.9842671101475682
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-suspension-bridge-base",
+        "category": "cross_lingual",
+        "left": "How does a suspension bridge carry load through its main cables?",
+        "right": "Como uma ponte pênsil transfere carga pelos cabos principais?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "suspension-bridge",
+        "note": "base"
+      },
+      "similarity": 0.8376390229042859
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-suspension-bridge-paraphrase",
+        "category": "cross_lingual",
+        "left": "In what way do the main cables of a suspension bridge bear the load?",
+        "right": "De que forma os cabos principais de uma ponte pênsil sustentam a carga?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "suspension-bridge",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8309383094568582
+    },
+    {
+      "pair": {
+        "id": "paraphrase-sourdough-en",
+        "category": "paraphrase",
+        "left": "What happens inside a sourdough starter during the first week?",
+        "right": "What is going on in a sourdough starter over its first seven days?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "sourdough",
+        "note": ""
+      },
+      "similarity": 0.9636718706832368
+    },
+    {
+      "pair": {
+        "id": "same_topic-sourdough-en",
+        "category": "same_topic",
+        "left": "What happens inside a sourdough starter during the first week?",
+        "right": "How do you tell whether a sourdough starter has gone bad?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "sourdough",
+        "note": ""
+      },
+      "similarity": 0.9132811432408517
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-sourdough-en",
+        "category": "minimal_pair",
+        "left": "What happens inside a sourdough starter during the first week?",
+        "right": "What happens inside a sourdough starter after the first year?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "sourdough",
+        "note": "temporal"
+      },
+      "similarity": 0.9743688907072552
+    },
+    {
+      "pair": {
+        "id": "paraphrase-sourdough-pt",
+        "category": "paraphrase",
+        "left": "O que acontece dentro de um fermento natural durante a primeira semana?",
+        "right": "O que se passa num fermento natural ao longo dos sete primeiros dias?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "sourdough",
+        "note": ""
+      },
+      "similarity": 0.9582438721137964
+    },
+    {
+      "pair": {
+        "id": "same_topic-sourdough-pt",
+        "category": "same_topic",
+        "left": "O que acontece dentro de um fermento natural durante a primeira semana?",
+        "right": "Como saber se um fermento natural estragou?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "sourdough",
+        "note": ""
+      },
+      "similarity": 0.9106448165783482
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-sourdough-pt",
+        "category": "minimal_pair",
+        "left": "O que acontece dentro de um fermento natural durante a primeira semana?",
+        "right": "O que acontece dentro de um fermento natural depois do primeiro ano?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "sourdough",
+        "note": "temporal"
+      },
+      "similarity": 0.9613648841097707
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-sourdough-base",
+        "category": "cross_lingual",
+        "left": "What happens inside a sourdough starter during the first week?",
+        "right": "O que acontece dentro de um fermento natural durante a primeira semana?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "sourdough",
+        "note": "base"
+      },
+      "similarity": 0.8810157313747221
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-sourdough-paraphrase",
+        "category": "cross_lingual",
+        "left": "What is going on in a sourdough starter over its first seven days?",
+        "right": "O que se passa num fermento natural ao longo dos sete primeiros dias?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "sourdough",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8795263658257629
+    },
+    {
+      "pair": {
+        "id": "paraphrase-tidal-locking-en",
+        "category": "paraphrase",
+        "left": "Why is the Moon tidally locked to the Earth?",
+        "right": "What made the Moon end up tidally locked with the Earth?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "tidal-locking",
+        "note": ""
+      },
+      "similarity": 0.9421019924987185
+    },
+    {
+      "pair": {
+        "id": "same_topic-tidal-locking-en",
+        "category": "same_topic",
+        "left": "Why is the Moon tidally locked to the Earth?",
+        "right": "How long did tidal locking take to happen for the Moon?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "tidal-locking",
+        "note": ""
+      },
+      "similarity": 0.9142002069539173
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-tidal-locking-en",
+        "category": "minimal_pair",
+        "left": "Why is the Moon tidally locked to the Earth?",
+        "right": "Why is Mercury tidally locked to the Sun?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "tidal-locking",
+        "note": "entity"
+      },
+      "similarity": 0.9473687991743582
+    },
+    {
+      "pair": {
+        "id": "paraphrase-tidal-locking-pt",
+        "category": "paraphrase",
+        "left": "Por que a Lua está em rotação sincronizada com a Terra?",
+        "right": "O que fez a Lua acabar com a rotação sincronizada à Terra?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "tidal-locking",
+        "note": ""
+      },
+      "similarity": 0.9627128228583764
+    },
+    {
+      "pair": {
+        "id": "same_topic-tidal-locking-pt",
+        "category": "same_topic",
+        "left": "Por que a Lua está em rotação sincronizada com a Terra?",
+        "right": "Quanto tempo levou para a Lua entrar em rotação sincronizada?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "tidal-locking",
+        "note": ""
+      },
+      "similarity": 0.9473660457201938
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-tidal-locking-pt",
+        "category": "minimal_pair",
+        "left": "Por que a Lua está em rotação sincronizada com a Terra?",
+        "right": "Por que Mercúrio está em rotação sincronizada com o Sol?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "tidal-locking",
+        "note": "entity"
+      },
+      "similarity": 0.9354483828494131
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-tidal-locking-base",
+        "category": "cross_lingual",
+        "left": "Why is the Moon tidally locked to the Earth?",
+        "right": "Por que a Lua está em rotação sincronizada com a Terra?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "tidal-locking",
+        "note": "base"
+      },
+      "similarity": 0.8596774344048962
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-tidal-locking-paraphrase",
+        "category": "cross_lingual",
+        "left": "What made the Moon end up tidally locked with the Earth?",
+        "right": "O que fez a Lua acabar com a rotação sincronizada à Terra?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "tidal-locking",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8377110197024552
+    },
+    {
+      "pair": {
+        "id": "paraphrase-antibiotic-resistance-en",
+        "category": "paraphrase",
+        "left": "How does antibiotic resistance spread between bacteria in a hospital?",
+        "right": "By what routes does resistance to antibiotics move among hospital bacteria?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "antibiotic-resistance",
+        "note": ""
+      },
+      "similarity": 0.9427631497870099
+    },
+    {
+      "pair": {
+        "id": "same_topic-antibiotic-resistance-en",
+        "category": "same_topic",
+        "left": "How does antibiotic resistance spread between bacteria in a hospital?",
+        "right": "Which antibiotics are held in reserve for resistant infections?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "antibiotic-resistance",
+        "note": ""
+      },
+      "similarity": 0.8930137691502995
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-antibiotic-resistance-en",
+        "category": "minimal_pair",
+        "left": "How does antibiotic resistance spread between bacteria in a hospital?",
+        "right": "How does antibiotic resistance fail to spread between bacteria in a hospital?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "antibiotic-resistance",
+        "note": "negation"
+      },
+      "similarity": 0.9779272460172861
+    },
+    {
+      "pair": {
+        "id": "paraphrase-antibiotic-resistance-pt",
+        "category": "paraphrase",
+        "left": "Como a resistência a antibióticos se espalha entre bactérias num hospital?",
+        "right": "Por quais vias a resistência a antibióticos passa de uma bactéria a outra no hospital?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "antibiotic-resistance",
+        "note": ""
+      },
+      "similarity": 0.9700504107803438
+    },
+    {
+      "pair": {
+        "id": "same_topic-antibiotic-resistance-pt",
+        "category": "same_topic",
+        "left": "Como a resistência a antibióticos se espalha entre bactérias num hospital?",
+        "right": "Quais antibióticos são reservados para infecções resistentes?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "antibiotic-resistance",
+        "note": ""
+      },
+      "similarity": 0.9129534509821504
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-antibiotic-resistance-pt",
+        "category": "minimal_pair",
+        "left": "Como a resistência a antibióticos se espalha entre bactérias num hospital?",
+        "right": "Por que a resistência a antibióticos não se espalha entre bactérias num hospital?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "antibiotic-resistance",
+        "note": "negation"
+      },
+      "similarity": 0.982898141094935
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-antibiotic-resistance-base",
+        "category": "cross_lingual",
+        "left": "How does antibiotic resistance spread between bacteria in a hospital?",
+        "right": "Como a resistência a antibióticos se espalha entre bactérias num hospital?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "antibiotic-resistance",
+        "note": "base"
+      },
+      "similarity": 0.9357845396693921
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-antibiotic-resistance-paraphrase",
+        "category": "cross_lingual",
+        "left": "By what routes does resistance to antibiotics move among hospital bacteria?",
+        "right": "Por quais vias a resistência a antibióticos passa de uma bactéria a outra no hospital?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "antibiotic-resistance",
+        "note": "paraphrase"
+      },
+      "similarity": 0.9017457257994662
+    },
+    {
+      "pair": {
+        "id": "paraphrase-shipping-container-en",
+        "category": "paraphrase",
+        "left": "How did the shipping container change port labour in the 1960s?",
+        "right": "What did containerisation do to dock work during the 1960s?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "shipping-container",
+        "note": ""
+      },
+      "similarity": 0.9171907189951162
+    },
+    {
+      "pair": {
+        "id": "same_topic-shipping-container-en",
+        "category": "same_topic",
+        "left": "How did the shipping container change port labour in the 1960s?",
+        "right": "Who set the standard dimensions for the shipping container?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "shipping-container",
+        "note": ""
+      },
+      "similarity": 0.8538437833448975
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-shipping-container-en",
+        "category": "minimal_pair",
+        "left": "How did the shipping container change port labour in the 1960s?",
+        "right": "How did the shipping container change port labour in the 2010s?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "shipping-container",
+        "note": "temporal"
+      },
+      "similarity": 0.948191994447095
+    },
+    {
+      "pair": {
+        "id": "paraphrase-shipping-container-pt",
+        "category": "paraphrase",
+        "left": "Como o contêiner mudou o trabalho portuário nos anos 1960?",
+        "right": "O que a conteinerização fez com o trabalho nas docas durante os anos 1960?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "shipping-container",
+        "note": ""
+      },
+      "similarity": 0.9350201997035318
+    },
+    {
+      "pair": {
+        "id": "same_topic-shipping-container-pt",
+        "category": "same_topic",
+        "left": "Como o contêiner mudou o trabalho portuário nos anos 1960?",
+        "right": "Quem definiu as dimensões padrão do contêiner de carga?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "shipping-container",
+        "note": ""
+      },
+      "similarity": 0.8714356542728656
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-shipping-container-pt",
+        "category": "minimal_pair",
+        "left": "Como o contêiner mudou o trabalho portuário nos anos 1960?",
+        "right": "Como o contêiner mudou o trabalho portuário nos anos 2010?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "shipping-container",
+        "note": "temporal"
+      },
+      "similarity": 0.9487698459354599
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-shipping-container-base",
+        "category": "cross_lingual",
+        "left": "How did the shipping container change port labour in the 1960s?",
+        "right": "Como o contêiner mudou o trabalho portuário nos anos 1960?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "shipping-container",
+        "note": "base"
+      },
+      "similarity": 0.9104852655324506
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-shipping-container-paraphrase",
+        "category": "cross_lingual",
+        "left": "What did containerisation do to dock work during the 1960s?",
+        "right": "O que a conteinerização fez com o trabalho nas docas durante os anos 1960?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "shipping-container",
+        "note": "paraphrase"
+      },
+      "similarity": 0.9015154834933816
+    },
+    {
+      "pair": {
+        "id": "paraphrase-coral-bleaching-en",
+        "category": "paraphrase",
+        "left": "At what temperature does coral start to bleach?",
+        "right": "How warm does the water have to get before coral bleaches?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "coral-bleaching",
+        "note": ""
+      },
+      "similarity": 0.9315571648053591
+    },
+    {
+      "pair": {
+        "id": "same_topic-coral-bleaching-en",
+        "category": "same_topic",
+        "left": "At what temperature does coral start to bleach?",
+        "right": "Can a bleached reef recover once the water cools again?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "coral-bleaching",
+        "note": ""
+      },
+      "similarity": 0.8675766013208893
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-coral-bleaching-en",
+        "category": "minimal_pair",
+        "left": "At what temperature does coral start to bleach?",
+        "right": "At what temperature does kelp start to die off?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "coral-bleaching",
+        "note": "entity"
+      },
+      "similarity": 0.8256191888178641
+    },
+    {
+      "pair": {
+        "id": "paraphrase-coral-bleaching-pt",
+        "category": "paraphrase",
+        "left": "A partir de que temperatura o coral começa a branquear?",
+        "right": "Quão quente a água precisa ficar para o coral branquear?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "coral-bleaching",
+        "note": ""
+      },
+      "similarity": 0.9475355022888178
+    },
+    {
+      "pair": {
+        "id": "same_topic-coral-bleaching-pt",
+        "category": "same_topic",
+        "left": "A partir de que temperatura o coral começa a branquear?",
+        "right": "Um recife branqueado consegue se recuperar quando a água esfria?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "coral-bleaching",
+        "note": ""
+      },
+      "similarity": 0.8670218239843528
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-coral-bleaching-pt",
+        "category": "minimal_pair",
+        "left": "A partir de que temperatura o coral começa a branquear?",
+        "right": "A partir de que temperatura as algas kelp começam a morrer?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "coral-bleaching",
+        "note": "entity"
+      },
+      "similarity": 0.8850402984207446
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-coral-bleaching-base",
+        "category": "cross_lingual",
+        "left": "At what temperature does coral start to bleach?",
+        "right": "A partir de que temperatura o coral começa a branquear?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "coral-bleaching",
+        "note": "base"
+      },
+      "similarity": 0.8995443355095544
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-coral-bleaching-paraphrase",
+        "category": "cross_lingual",
+        "left": "How warm does the water have to get before coral bleaches?",
+        "right": "Quão quente a água precisa ficar para o coral branquear?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "coral-bleaching",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8811293747810586
+    },
+    {
+      "pair": {
+        "id": "paraphrase-rent-control-en",
+        "category": "paraphrase",
+        "left": "What does rent control do to the supply of rental housing?",
+        "right": "How does capping rents affect how much rental housing gets built?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "rent-control",
+        "note": ""
+      },
+      "similarity": 0.8756765979198698
+    },
+    {
+      "pair": {
+        "id": "same_topic-rent-control-en",
+        "category": "same_topic",
+        "left": "What does rent control do to the supply of rental housing?",
+        "right": "Which cities have repealed rent control and why?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "rent-control",
+        "note": ""
+      },
+      "similarity": 0.8860689259749224
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-rent-control-en",
+        "category": "minimal_pair",
+        "left": "What does rent control do to the supply of rental housing?",
+        "right": "What does removing rent control do to the supply of rental housing?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "rent-control",
+        "note": "negation"
+      },
+      "similarity": 0.9673534787238535
+    },
+    {
+      "pair": {
+        "id": "paraphrase-rent-control-pt",
+        "category": "paraphrase",
+        "left": "O que o controle de aluguéis faz com a oferta de imóveis para locação?",
+        "right": "Como limitar aluguéis afeta a quantidade de imóveis colocados para alugar?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "rent-control",
+        "note": ""
+      },
+      "similarity": 0.9254231242271773
+    },
+    {
+      "pair": {
+        "id": "same_topic-rent-control-pt",
+        "category": "same_topic",
+        "left": "O que o controle de aluguéis faz com a oferta de imóveis para locação?",
+        "right": "Quais cidades revogaram o controle de aluguéis e por quê?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "rent-control",
+        "note": ""
+      },
+      "similarity": 0.9212506574221324
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-rent-control-pt",
+        "category": "minimal_pair",
+        "left": "O que o controle de aluguéis faz com a oferta de imóveis para locação?",
+        "right": "O que retirar o controle de aluguéis faz com a oferta de imóveis para locação?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "rent-control",
+        "note": "negation"
+      },
+      "similarity": 0.9734271786472215
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-rent-control-base",
+        "category": "cross_lingual",
+        "left": "What does rent control do to the supply of rental housing?",
+        "right": "O que o controle de aluguéis faz com a oferta de imóveis para locação?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "rent-control",
+        "note": "base"
+      },
+      "similarity": 0.8801619351284188
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-rent-control-paraphrase",
+        "category": "cross_lingual",
+        "left": "How does capping rents affect how much rental housing gets built?",
+        "right": "Como limitar aluguéis afeta a quantidade de imóveis colocados para alugar?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "rent-control",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8449482722634007
+    },
+    {
+      "pair": {
+        "id": "paraphrase-nitrogen-fixation-en",
+        "category": "paraphrase",
+        "left": "How do legumes fix nitrogen with root bacteria?",
+        "right": "In what way do bacteria in legume roots capture nitrogen?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "nitrogen-fixation",
+        "note": ""
+      },
+      "similarity": 0.9594871466193938
+    },
+    {
+      "pair": {
+        "id": "same_topic-nitrogen-fixation-en",
+        "category": "same_topic",
+        "left": "How do legumes fix nitrogen with root bacteria?",
+        "right": "How much nitrogen does a clover cover crop leave in the soil?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "nitrogen-fixation",
+        "note": ""
+      },
+      "similarity": 0.8519432667461654
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-nitrogen-fixation-en",
+        "category": "minimal_pair",
+        "left": "How do legumes fix nitrogen with root bacteria?",
+        "right": "How do legumes take up phosphorus with root fungi?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "nitrogen-fixation",
+        "note": "entity"
+      },
+      "similarity": 0.9194280044177477
+    },
+    {
+      "pair": {
+        "id": "paraphrase-nitrogen-fixation-pt",
+        "category": "paraphrase",
+        "left": "Como as leguminosas fixam nitrogênio com bactérias nas raízes?",
+        "right": "De que maneira as bactérias das raízes de leguminosas capturam nitrogênio?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "nitrogen-fixation",
+        "note": ""
+      },
+      "similarity": 0.9723510508054254
+    },
+    {
+      "pair": {
+        "id": "same_topic-nitrogen-fixation-pt",
+        "category": "same_topic",
+        "left": "Como as leguminosas fixam nitrogênio com bactérias nas raízes?",
+        "right": "Quanto nitrogênio uma cobertura de trevo deixa no solo?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "nitrogen-fixation",
+        "note": ""
+      },
+      "similarity": 0.8776134643508438
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-nitrogen-fixation-pt",
+        "category": "minimal_pair",
+        "left": "Como as leguminosas fixam nitrogênio com bactérias nas raízes?",
+        "right": "Como as leguminosas absorvem fósforo com fungos nas raízes?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "nitrogen-fixation",
+        "note": "entity"
+      },
+      "similarity": 0.9096201406799488
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-nitrogen-fixation-base",
+        "category": "cross_lingual",
+        "left": "How do legumes fix nitrogen with root bacteria?",
+        "right": "Como as leguminosas fixam nitrogênio com bactérias nas raízes?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "nitrogen-fixation",
+        "note": "base"
+      },
+      "similarity": 0.9107051628454801
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-nitrogen-fixation-paraphrase",
+        "category": "cross_lingual",
+        "left": "In what way do bacteria in legume roots capture nitrogen?",
+        "right": "De que maneira as bactérias das raízes de leguminosas capturam nitrogênio?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "nitrogen-fixation",
+        "note": "paraphrase"
+      },
+      "similarity": 0.9135087759387547
+    },
+    {
+      "pair": {
+        "id": "paraphrase-error-correction-en",
+        "category": "paraphrase",
+        "left": "How do error correcting codes recover data from a failed drive?",
+        "right": "In what way does error correction rebuild data when a drive dies?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "error-correction",
+        "note": ""
+      },
+      "similarity": 0.9076658779213396
+    },
+    {
+      "pair": {
+        "id": "same_topic-error-correction-en",
+        "category": "same_topic",
+        "left": "How do error correcting codes recover data from a failed drive?",
+        "right": "How much storage overhead does erasure coding cost?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "error-correction",
+        "note": ""
+      },
+      "similarity": 0.8519310953344239
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-error-correction-en",
+        "category": "minimal_pair",
+        "left": "How do error correcting codes recover data from a failed drive?",
+        "right": "How do checksums detect data corruption on a failed drive?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "error-correction",
+        "note": "entity"
+      },
+      "similarity": 0.9179541872789615
+    },
+    {
+      "pair": {
+        "id": "paraphrase-error-correction-pt",
+        "category": "paraphrase",
+        "left": "Como os códigos corretores de erro recuperam dados de um disco que falhou?",
+        "right": "De que forma a correção de erros reconstrói dados quando um disco morre?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "error-correction",
+        "note": ""
+      },
+      "similarity": 0.9424896017634297
+    },
+    {
+      "pair": {
+        "id": "same_topic-error-correction-pt",
+        "category": "same_topic",
+        "left": "Como os códigos corretores de erro recuperam dados de um disco que falhou?",
+        "right": "Quanto espaço extra o erasure coding custa em armazenamento?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "error-correction",
+        "note": ""
+      },
+      "similarity": 0.8662299806644888
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-error-correction-pt",
+        "category": "minimal_pair",
+        "left": "Como os códigos corretores de erro recuperam dados de um disco que falhou?",
+        "right": "Como os checksums detectam corrupção de dados num disco que falhou?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "error-correction",
+        "note": "entity"
+      },
+      "similarity": 0.9273542484469539
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-error-correction-base",
+        "category": "cross_lingual",
+        "left": "How do error correcting codes recover data from a failed drive?",
+        "right": "Como os códigos corretores de erro recuperam dados de um disco que falhou?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "error-correction",
+        "note": "base"
+      },
+      "similarity": 0.9131416231068058
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-error-correction-paraphrase",
+        "category": "cross_lingual",
+        "left": "In what way does error correction rebuild data when a drive dies?",
+        "right": "De que forma a correção de erros reconstrói dados quando um disco morre?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "error-correction",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8905286628811259
+    },
+    {
+      "pair": {
+        "id": "paraphrase-arctic-tern-en",
+        "category": "paraphrase",
+        "left": "How does the Arctic tern navigate on its yearly migration?",
+        "right": "What does the Arctic tern use to find its way each year when it migrates?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "arctic-tern",
+        "note": ""
+      },
+      "similarity": 0.970743110908486
+    },
+    {
+      "pair": {
+        "id": "same_topic-arctic-tern-en",
+        "category": "same_topic",
+        "left": "How does the Arctic tern navigate on its yearly migration?",
+        "right": "How far does an Arctic tern travel in a single migration?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "arctic-tern",
+        "note": ""
+      },
+      "similarity": 0.9429434495102197
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-arctic-tern-en",
+        "category": "minimal_pair",
+        "left": "How does the Arctic tern navigate on its yearly migration?",
+        "right": "How does the monarch butterfly navigate on its yearly migration?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "arctic-tern",
+        "note": "entity"
+      },
+      "similarity": 0.9023518086876245
+    },
+    {
+      "pair": {
+        "id": "paraphrase-arctic-tern-pt",
+        "category": "paraphrase",
+        "left": "Como a andorinha-do-ártico se orienta na migração anual?",
+        "right": "O que a andorinha-do-ártico usa para achar o caminho a cada migração?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "arctic-tern",
+        "note": ""
+      },
+      "similarity": 0.9632440652982421
+    },
+    {
+      "pair": {
+        "id": "same_topic-arctic-tern-pt",
+        "category": "same_topic",
+        "left": "Como a andorinha-do-ártico se orienta na migração anual?",
+        "right": "Que distância uma andorinha-do-ártico percorre numa única migração?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "arctic-tern",
+        "note": ""
+      },
+      "similarity": 0.9467512888533396
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-arctic-tern-pt",
+        "category": "minimal_pair",
+        "left": "Como a andorinha-do-ártico se orienta na migração anual?",
+        "right": "Como a borboleta-monarca se orienta na migração anual?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "arctic-tern",
+        "note": "entity"
+      },
+      "similarity": 0.925853713036718
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-arctic-tern-base",
+        "category": "cross_lingual",
+        "left": "How does the Arctic tern navigate on its yearly migration?",
+        "right": "Como a andorinha-do-ártico se orienta na migração anual?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "arctic-tern",
+        "note": "base"
+      },
+      "similarity": 0.8599568248172205
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-arctic-tern-paraphrase",
+        "category": "cross_lingual",
+        "left": "What does the Arctic tern use to find its way each year when it migrates?",
+        "right": "O que a andorinha-do-ártico usa para achar o caminho a cada migração?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "arctic-tern",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8257233702808517
+    },
+    {
+      "pair": {
+        "id": "paraphrase-reverse-osmosis-en",
+        "category": "paraphrase",
+        "left": "Why does reverse osmosis need high pressure to desalinate water?",
+        "right": "What makes high pressure necessary for desalination by reverse osmosis?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "reverse-osmosis",
+        "note": ""
+      },
+      "similarity": 0.9696297159855375
+    },
+    {
+      "pair": {
+        "id": "same_topic-reverse-osmosis-en",
+        "category": "same_topic",
+        "left": "Why does reverse osmosis need high pressure to desalinate water?",
+        "right": "What happens to the brine left over from reverse osmosis?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "reverse-osmosis",
+        "note": ""
+      },
+      "similarity": 0.8894025941711677
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-reverse-osmosis-en",
+        "category": "minimal_pair",
+        "left": "Why does reverse osmosis need high pressure to desalinate water?",
+        "right": "Why does reverse osmosis work without high pressure to desalinate water?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "reverse-osmosis",
+        "note": "negation"
+      },
+      "similarity": 0.9780771027775897
+    },
+    {
+      "pair": {
+        "id": "paraphrase-reverse-osmosis-pt",
+        "category": "paraphrase",
+        "left": "Por que a osmose reversa precisa de alta pressão para dessalinizar água?",
+        "right": "O que torna a alta pressão necessária na dessalinização por osmose reversa?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "reverse-osmosis",
+        "note": ""
+      },
+      "similarity": 0.9800006524493505
+    },
+    {
+      "pair": {
+        "id": "same_topic-reverse-osmosis-pt",
+        "category": "same_topic",
+        "left": "Por que a osmose reversa precisa de alta pressão para dessalinizar água?",
+        "right": "O que acontece com a salmoura que sobra da osmose reversa?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "reverse-osmosis",
+        "note": ""
+      },
+      "similarity": 0.8856135140764918
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-reverse-osmosis-pt",
+        "category": "minimal_pair",
+        "left": "Por que a osmose reversa precisa de alta pressão para dessalinizar água?",
+        "right": "Por que a osmose reversa funciona sem alta pressão para dessalinizar água?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "reverse-osmosis",
+        "note": "negation"
+      },
+      "similarity": 0.9861555384121797
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-reverse-osmosis-base",
+        "category": "cross_lingual",
+        "left": "Why does reverse osmosis need high pressure to desalinate water?",
+        "right": "Por que a osmose reversa precisa de alta pressão para dessalinizar água?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "reverse-osmosis",
+        "note": "base"
+      },
+      "similarity": 0.9203378841223852
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-reverse-osmosis-paraphrase",
+        "category": "cross_lingual",
+        "left": "What makes high pressure necessary for desalination by reverse osmosis?",
+        "right": "O que torna a alta pressão necessária na dessalinização por osmose reversa?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "reverse-osmosis",
+        "note": "paraphrase"
+      },
+      "similarity": 0.9072106592033612
+    },
+    {
+      "pair": {
+        "id": "paraphrase-urban-heat-en",
+        "category": "paraphrase",
+        "left": "Why are cities hotter than the countryside at night?",
+        "right": "What makes urban areas warmer than rural ones after dark?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "urban-heat",
+        "note": ""
+      },
+      "similarity": 0.8879440589157989
+    },
+    {
+      "pair": {
+        "id": "same_topic-urban-heat-en",
+        "category": "same_topic",
+        "left": "Why are cities hotter than the countryside at night?",
+        "right": "Which building materials worsen the urban heat island effect?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "urban-heat",
+        "note": ""
+      },
+      "similarity": 0.8116437732165932
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-urban-heat-en",
+        "category": "minimal_pair",
+        "left": "Why are cities hotter than the countryside at night?",
+        "right": "Why are cities hotter than the countryside at midday?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "urban-heat",
+        "note": "temporal"
+      },
+      "similarity": 0.9740980590540544
+    },
+    {
+      "pair": {
+        "id": "paraphrase-urban-heat-pt",
+        "category": "paraphrase",
+        "left": "Por que as cidades são mais quentes que o campo à noite?",
+        "right": "O que faz as áreas urbanas ficarem mais quentes que as rurais depois do anoitecer?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "urban-heat",
+        "note": ""
+      },
+      "similarity": 0.9088435455166018
+    },
+    {
+      "pair": {
+        "id": "same_topic-urban-heat-pt",
+        "category": "same_topic",
+        "left": "Por que as cidades são mais quentes que o campo à noite?",
+        "right": "Quais materiais de construção agravam a ilha de calor urbana?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "urban-heat",
+        "note": ""
+      },
+      "similarity": 0.8636594148126078
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-urban-heat-pt",
+        "category": "minimal_pair",
+        "left": "Por que as cidades são mais quentes que o campo à noite?",
+        "right": "Por que as cidades são mais quentes que o campo ao meio-dia?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "urban-heat",
+        "note": "temporal"
+      },
+      "similarity": 0.973751786227464
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-urban-heat-base",
+        "category": "cross_lingual",
+        "left": "Why are cities hotter than the countryside at night?",
+        "right": "Por que as cidades são mais quentes que o campo à noite?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "urban-heat",
+        "note": "base"
+      },
+      "similarity": 0.8793266456156211
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-urban-heat-paraphrase",
+        "category": "cross_lingual",
+        "left": "What makes urban areas warmer than rural ones after dark?",
+        "right": "O que faz as áreas urbanas ficarem mais quentes que as rurais depois do anoitecer?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "urban-heat",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8868297741751314
+    },
+    {
+      "pair": {
+        "id": "paraphrase-mycorrhizal-en",
+        "category": "paraphrase",
+        "left": "How do mycorrhizal networks move nutrients between trees?",
+        "right": "In what way do fungal networks carry nutrients from tree to tree?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "mycorrhizal",
+        "note": ""
+      },
+      "similarity": 0.9281990461141181
+    },
+    {
+      "pair": {
+        "id": "same_topic-mycorrhizal-en",
+        "category": "same_topic",
+        "left": "How do mycorrhizal networks move nutrients between trees?",
+        "right": "Do mycorrhizal networks also transmit stress signals?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "mycorrhizal",
+        "note": ""
+      },
+      "similarity": 0.9056640276340842
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-mycorrhizal-en",
+        "category": "minimal_pair",
+        "left": "How do mycorrhizal networks move nutrients between trees?",
+        "right": "How do root grafts move nutrients between trees?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "mycorrhizal",
+        "note": "entity"
+      },
+      "similarity": 0.9367246246484395
+    },
+    {
+      "pair": {
+        "id": "paraphrase-mycorrhizal-pt",
+        "category": "paraphrase",
+        "left": "Como as redes micorrízicas movem nutrientes entre árvores?",
+        "right": "De que forma as redes de fungos transportam nutrientes de uma árvore a outra?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "mycorrhizal",
+        "note": ""
+      },
+      "similarity": 0.9488687601476054
+    },
+    {
+      "pair": {
+        "id": "same_topic-mycorrhizal-pt",
+        "category": "same_topic",
+        "left": "Como as redes micorrízicas movem nutrientes entre árvores?",
+        "right": "As redes micorrízicas também transmitem sinais de estresse?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "mycorrhizal",
+        "note": ""
+      },
+      "similarity": 0.911528282186324
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-mycorrhizal-pt",
+        "category": "minimal_pair",
+        "left": "Como as redes micorrízicas movem nutrientes entre árvores?",
+        "right": "Como os enxertos de raiz movem nutrientes entre árvores?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "mycorrhizal",
+        "note": "entity"
+      },
+      "similarity": 0.9350954835414086
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-mycorrhizal-base",
+        "category": "cross_lingual",
+        "left": "How do mycorrhizal networks move nutrients between trees?",
+        "right": "Como as redes micorrízicas movem nutrientes entre árvores?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "mycorrhizal",
+        "note": "base"
+      },
+      "similarity": 0.9225657289061747
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-mycorrhizal-paraphrase",
+        "category": "cross_lingual",
+        "left": "In what way do fungal networks carry nutrients from tree to tree?",
+        "right": "De que forma as redes de fungos transportam nutrientes de uma árvore a outra?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "mycorrhizal",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8887664760570169
+    },
+    {
+      "pair": {
+        "id": "paraphrase-concert-hall-en",
+        "category": "paraphrase",
+        "left": "What makes a concert hall sound good for orchestral music?",
+        "right": "Which qualities give a concert hall good acoustics for an orchestra?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "concert-hall",
+        "note": ""
+      },
+      "similarity": 0.9560879332699816
+    },
+    {
+      "pair": {
+        "id": "same_topic-concert-hall-en",
+        "category": "same_topic",
+        "left": "What makes a concert hall sound good for orchestral music?",
+        "right": "How is reverberation time measured in a concert hall?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "concert-hall",
+        "note": ""
+      },
+      "similarity": 0.8954351643813235
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-concert-hall-en",
+        "category": "minimal_pair",
+        "left": "What makes a concert hall sound good for orchestral music?",
+        "right": "What makes a concert hall sound bad for orchestral music?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "concert-hall",
+        "note": "negation"
+      },
+      "similarity": 0.9701062384864416
+    },
+    {
+      "pair": {
+        "id": "paraphrase-concert-hall-pt",
+        "category": "paraphrase",
+        "left": "O que faz uma sala de concertos soar bem para música orquestral?",
+        "right": "Quais qualidades dão a uma sala de concertos boa acústica para orquestra?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "concert-hall",
+        "note": ""
+      },
+      "similarity": 0.9584275949932474
+    },
+    {
+      "pair": {
+        "id": "same_topic-concert-hall-pt",
+        "category": "same_topic",
+        "left": "O que faz uma sala de concertos soar bem para música orquestral?",
+        "right": "Como o tempo de reverberação é medido numa sala de concertos?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "concert-hall",
+        "note": ""
+      },
+      "similarity": 0.9085734670109846
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-concert-hall-pt",
+        "category": "minimal_pair",
+        "left": "O que faz uma sala de concertos soar bem para música orquestral?",
+        "right": "O que faz uma sala de concertos soar mal para música orquestral?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "concert-hall",
+        "note": "negation"
+      },
+      "similarity": 0.9796429246500727
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-concert-hall-base",
+        "category": "cross_lingual",
+        "left": "What makes a concert hall sound good for orchestral music?",
+        "right": "O que faz uma sala de concertos soar bem para música orquestral?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "concert-hall",
+        "note": "base"
+      },
+      "similarity": 0.882939090965552
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-concert-hall-paraphrase",
+        "category": "cross_lingual",
+        "left": "Which qualities give a concert hall good acoustics for an orchestra?",
+        "right": "Quais qualidades dão a uma sala de concertos boa acústica para orquestra?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "concert-hall",
+        "note": "paraphrase"
+      },
+      "similarity": 0.9079005443045212
+    },
+    {
+      "pair": {
+        "id": "paraphrase-lithium-brine-en",
+        "category": "paraphrase",
+        "left": "How is lithium extracted from salt flat brine?",
+        "right": "What is the process for getting lithium out of brine in a salt flat?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "lithium-brine",
+        "note": ""
+      },
+      "similarity": 0.9752296298509822
+    },
+    {
+      "pair": {
+        "id": "same_topic-lithium-brine-en",
+        "category": "same_topic",
+        "left": "How is lithium extracted from salt flat brine?",
+        "right": "How much water does lithium brine extraction consume?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "lithium-brine",
+        "note": ""
+      },
+      "similarity": 0.9327999156008198
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-lithium-brine-en",
+        "category": "minimal_pair",
+        "left": "How is lithium extracted from salt flat brine?",
+        "right": "How is potash extracted from salt flat brine?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "lithium-brine",
+        "note": "entity"
+      },
+      "similarity": 0.9261727781319063
+    },
+    {
+      "pair": {
+        "id": "paraphrase-lithium-brine-pt",
+        "category": "paraphrase",
+        "left": "Como o lítio é extraído da salmoura de salares?",
+        "right": "Qual é o processo para obter lítio a partir da salmoura de um salar?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "lithium-brine",
+        "note": ""
+      },
+      "similarity": 0.9390974771075739
+    },
+    {
+      "pair": {
+        "id": "same_topic-lithium-brine-pt",
+        "category": "same_topic",
+        "left": "Como o lítio é extraído da salmoura de salares?",
+        "right": "Quanta água a extração de lítio em salmoura consome?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "lithium-brine",
+        "note": ""
+      },
+      "similarity": 0.9219835925328492
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-lithium-brine-pt",
+        "category": "minimal_pair",
+        "left": "Como o lítio é extraído da salmoura de salares?",
+        "right": "Como a potassa é extraída da salmoura de salares?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "lithium-brine",
+        "note": "entity"
+      },
+      "similarity": 0.9254060710070521
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-lithium-brine-base",
+        "category": "cross_lingual",
+        "left": "How is lithium extracted from salt flat brine?",
+        "right": "Como o lítio é extraído da salmoura de salares?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "lithium-brine",
+        "note": "base"
+      },
+      "similarity": 0.8692827113203232
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-lithium-brine-paraphrase",
+        "category": "cross_lingual",
+        "left": "What is the process for getting lithium out of brine in a salt flat?",
+        "right": "Qual é o processo para obter lítio a partir da salmoura de um salar?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "lithium-brine",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8663528011902086
+    },
+    {
+      "pair": {
+        "id": "paraphrase-printing-press-en",
+        "category": "paraphrase",
+        "left": "How did the printing press change literacy in the fifteenth century?",
+        "right": "What did movable type do to reading rates during the fifteenth century?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "printing-press",
+        "note": ""
+      },
+      "similarity": 0.8804701051281281
+    },
+    {
+      "pair": {
+        "id": "same_topic-printing-press-en",
+        "category": "same_topic",
+        "left": "How did the printing press change literacy in the fifteenth century?",
+        "right": "Who financed the earliest printing houses in Europe?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "printing-press",
+        "note": ""
+      },
+      "similarity": 0.812765346556783
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-printing-press-en",
+        "category": "minimal_pair",
+        "left": "How did the printing press change literacy in the fifteenth century?",
+        "right": "How did the printing press change literacy in the nineteenth century?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "printing-press",
+        "note": "temporal"
+      },
+      "similarity": 0.9387152099666904
+    },
+    {
+      "pair": {
+        "id": "paraphrase-printing-press-pt",
+        "category": "paraphrase",
+        "left": "Como a imprensa mudou a alfabetização no século quinze?",
+        "right": "O que os tipos móveis fizeram com as taxas de leitura durante o século quinze?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "printing-press",
+        "note": ""
+      },
+      "similarity": 0.9013683213059974
+    },
+    {
+      "pair": {
+        "id": "same_topic-printing-press-pt",
+        "category": "same_topic",
+        "left": "Como a imprensa mudou a alfabetização no século quinze?",
+        "right": "Quem financiou as primeiras tipografias da Europa?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "printing-press",
+        "note": ""
+      },
+      "similarity": 0.8115703721337952
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-printing-press-pt",
+        "category": "minimal_pair",
+        "left": "Como a imprensa mudou a alfabetização no século quinze?",
+        "right": "Como a imprensa mudou a alfabetização no século dezenove?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "printing-press",
+        "note": "temporal"
+      },
+      "similarity": 0.963089259612034
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-printing-press-base",
+        "category": "cross_lingual",
+        "left": "How did the printing press change literacy in the fifteenth century?",
+        "right": "Como a imprensa mudou a alfabetização no século quinze?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "printing-press",
+        "note": "base"
+      },
+      "similarity": 0.8855395016099122
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-printing-press-paraphrase",
+        "category": "cross_lingual",
+        "left": "What did movable type do to reading rates during the fifteenth century?",
+        "right": "O que os tipos móveis fizeram com as taxas de leitura durante o século quinze?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "printing-press",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8910761135983455
+    },
+    {
+      "pair": {
+        "id": "paraphrase-circadian-plants-en",
+        "category": "paraphrase",
+        "left": "How do plants keep circadian rhythm without a nervous system?",
+        "right": "By what means do plants hold a daily rhythm despite having no nerves?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "circadian-plants",
+        "note": ""
+      },
+      "similarity": 0.9455031166170773
+    },
+    {
+      "pair": {
+        "id": "same_topic-circadian-plants-en",
+        "category": "same_topic",
+        "left": "How do plants keep circadian rhythm without a nervous system?",
+        "right": "What happens to a plant kept in constant light for weeks?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "circadian-plants",
+        "note": ""
+      },
+      "similarity": 0.8866757479553157
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-circadian-plants-en",
+        "category": "minimal_pair",
+        "left": "How do plants keep circadian rhythm without a nervous system?",
+        "right": "How do fungi keep circadian rhythm without a nervous system?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "circadian-plants",
+        "note": "entity"
+      },
+      "similarity": 0.9646372585587325
+    },
+    {
+      "pair": {
+        "id": "paraphrase-circadian-plants-pt",
+        "category": "paraphrase",
+        "left": "Como as plantas mantêm ritmo circadiano sem sistema nervoso?",
+        "right": "Por quais meios as plantas sustentam um ritmo diário mesmo sem nervos?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "circadian-plants",
+        "note": ""
+      },
+      "similarity": 0.9364556788827534
+    },
+    {
+      "pair": {
+        "id": "same_topic-circadian-plants-pt",
+        "category": "same_topic",
+        "left": "Como as plantas mantêm ritmo circadiano sem sistema nervoso?",
+        "right": "O que acontece com uma planta mantida em luz constante por semanas?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "circadian-plants",
+        "note": ""
+      },
+      "similarity": 0.8982983719528042
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-circadian-plants-pt",
+        "category": "minimal_pair",
+        "left": "Como as plantas mantêm ritmo circadiano sem sistema nervoso?",
+        "right": "Como os fungos mantêm ritmo circadiano sem sistema nervoso?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "circadian-plants",
+        "note": "entity"
+      },
+      "similarity": 0.949423641154885
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-circadian-plants-base",
+        "category": "cross_lingual",
+        "left": "How do plants keep circadian rhythm without a nervous system?",
+        "right": "Como as plantas mantêm ritmo circadiano sem sistema nervoso?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "circadian-plants",
+        "note": "base"
+      },
+      "similarity": 0.9099272147421102
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-circadian-plants-paraphrase",
+        "category": "cross_lingual",
+        "left": "By what means do plants hold a daily rhythm despite having no nerves?",
+        "right": "Por quais meios as plantas sustentam um ritmo diário mesmo sem nervos?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "circadian-plants",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8958573216050277
+    },
+    {
+      "pair": {
+        "id": "paraphrase-railway-gauge-en",
+        "category": "paraphrase",
+        "left": "Why did railways standardise on a single track gauge?",
+        "right": "What drove railways to settle on one common gauge for track?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "railway-gauge",
+        "note": ""
+      },
+      "similarity": 0.9339649220188311
+    },
+    {
+      "pair": {
+        "id": "same_topic-railway-gauge-en",
+        "category": "same_topic",
+        "left": "Why did railways standardise on a single track gauge?",
+        "right": "Which countries still run on a gauge different from the standard?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "railway-gauge",
+        "note": ""
+      },
+      "similarity": 0.8696021297950497
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-railway-gauge-en",
+        "category": "minimal_pair",
+        "left": "Why did railways standardise on a single track gauge?",
+        "right": "Why did railways refuse to standardise on a single track gauge?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "railway-gauge",
+        "note": "negation"
+      },
+      "similarity": 0.9798355268429941
+    },
+    {
+      "pair": {
+        "id": "paraphrase-railway-gauge-pt",
+        "category": "paraphrase",
+        "left": "Por que as ferrovias padronizaram uma única bitola?",
+        "right": "O que levou as ferrovias a adotar uma bitola comum para os trilhos?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "railway-gauge",
+        "note": ""
+      },
+      "similarity": 0.939295509036144
+    },
+    {
+      "pair": {
+        "id": "same_topic-railway-gauge-pt",
+        "category": "same_topic",
+        "left": "Por que as ferrovias padronizaram uma única bitola?",
+        "right": "Quais países ainda operam com bitola diferente da padrão?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "railway-gauge",
+        "note": ""
+      },
+      "similarity": 0.882897411350081
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-railway-gauge-pt",
+        "category": "minimal_pair",
+        "left": "Por que as ferrovias padronizaram uma única bitola?",
+        "right": "Por que as ferrovias se recusaram a padronizar uma única bitola?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "railway-gauge",
+        "note": "negation"
+      },
+      "similarity": 0.9833996111538115
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-railway-gauge-base",
+        "category": "cross_lingual",
+        "left": "Why did railways standardise on a single track gauge?",
+        "right": "Por que as ferrovias padronizaram uma única bitola?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "railway-gauge",
+        "note": "base"
+      },
+      "similarity": 0.8128130202263035
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-railway-gauge-paraphrase",
+        "category": "cross_lingual",
+        "left": "What drove railways to settle on one common gauge for track?",
+        "right": "O que levou as ferrovias a adotar uma bitola comum para os trilhos?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "railway-gauge",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8150763740269129
+    },
+    {
+      "pair": {
+        "id": "paraphrase-peat-bog-en",
+        "category": "paraphrase",
+        "left": "Why do peat bogs preserve human remains so well?",
+        "right": "What is it about peat bogs that keeps human bodies intact for so long?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "peat-bog",
+        "note": ""
+      },
+      "similarity": 0.9475113543639174
+    },
+    {
+      "pair": {
+        "id": "same_topic-peat-bog-en",
+        "category": "same_topic",
+        "left": "Why do peat bogs preserve human remains so well?",
+        "right": "How are bog bodies dated once they are found?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "peat-bog",
+        "note": ""
+      },
+      "similarity": 0.8857765202616175
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-peat-bog-en",
+        "category": "minimal_pair",
+        "left": "Why do peat bogs preserve human remains so well?",
+        "right": "Why do salt mines preserve human remains so well?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "peat-bog",
+        "note": "entity"
+      },
+      "similarity": 0.9442856027502597
+    },
+    {
+      "pair": {
+        "id": "paraphrase-peat-bog-pt",
+        "category": "paraphrase",
+        "left": "Por que os pântanos de turfa preservam tão bem restos humanos?",
+        "right": "O que os pântanos de turfa têm que mantém corpos humanos íntegros por tanto tempo?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "peat-bog",
+        "note": ""
+      },
+      "similarity": 0.9418703072278006
+    },
+    {
+      "pair": {
+        "id": "same_topic-peat-bog-pt",
+        "category": "same_topic",
+        "left": "Por que os pântanos de turfa preservam tão bem restos humanos?",
+        "right": "Como os corpos encontrados em turfeiras são datados?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "peat-bog",
+        "note": ""
+      },
+      "similarity": 0.8785106285865036
+    },
+    {
+      "pair": {
+        "id": "minimal_pair-peat-bog-pt",
+        "category": "minimal_pair",
+        "left": "Por que os pântanos de turfa preservam tão bem restos humanos?",
+        "right": "Por que as minas de sal preservam tão bem restos humanos?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "peat-bog",
+        "note": "entity"
+      },
+      "similarity": 0.9149738887061072
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-peat-bog-base",
+        "category": "cross_lingual",
+        "left": "Why do peat bogs preserve human remains so well?",
+        "right": "Por que os pântanos de turfa preservam tão bem restos humanos?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "peat-bog",
+        "note": "base"
+      },
+      "similarity": 0.856163336819476
+    },
+    {
+      "pair": {
+        "id": "cross_lingual-peat-bog-paraphrase",
+        "category": "cross_lingual",
+        "left": "What is it about peat bogs that keeps human bodies intact for so long?",
+        "right": "O que os pântanos de turfa têm que mantém corpos humanos íntegros por tanto tempo?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "peat-bog",
+        "note": "paraphrase"
+      },
+      "similarity": 0.8546367026606041
+    },
+    {
+      "pair": {
+        "id": "unrelated-coffee-rust-rent-control-en",
+        "category": "unrelated",
+        "left": "What causes coffee leaf rust to spread so quickly in wet seasons?",
+        "right": "What does rent control do to the supply of rental housing?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "coffee-rust|rent-control",
+        "note": ""
+      },
+      "similarity": 0.7674150057625554
+    },
+    {
+      "pair": {
+        "id": "unrelated-coffee-rust-rent-control-pt",
+        "category": "unrelated",
+        "left": "O que faz a ferrugem do cafeeiro se espalhar tão rápido na estação chuvosa?",
+        "right": "O que o controle de aluguéis faz com a oferta de imóveis para locação?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "coffee-rust|rent-control",
+        "note": ""
+      },
+      "similarity": 0.8122385139119428
+    },
+    {
+      "pair": {
+        "id": "unrelated-coffee-rust-rent-control-en-pt",
+        "category": "unrelated",
+        "left": "What causes coffee leaf rust to spread so quickly in wet seasons?",
+        "right": "O que o controle de aluguéis faz com a oferta de imóveis para locação?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "coffee-rust|rent-control",
+        "note": ""
+      },
+      "similarity": 0.7565879917520566
+    },
+    {
+      "pair": {
+        "id": "unrelated-suspension-bridge-nitrogen-fixation-en",
+        "category": "unrelated",
+        "left": "How does a suspension bridge carry load through its main cables?",
+        "right": "How do legumes fix nitrogen with root bacteria?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "suspension-bridge|nitrogen-fixation",
+        "note": ""
+      },
+      "similarity": 0.8040887335024914
+    },
+    {
+      "pair": {
+        "id": "unrelated-suspension-bridge-nitrogen-fixation-pt",
+        "category": "unrelated",
+        "left": "Como uma ponte pênsil transfere carga pelos cabos principais?",
+        "right": "Como as leguminosas fixam nitrogênio com bactérias nas raízes?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "suspension-bridge|nitrogen-fixation",
+        "note": ""
+      },
+      "similarity": 0.826201464836356
+    },
+    {
+      "pair": {
+        "id": "unrelated-suspension-bridge-nitrogen-fixation-en-pt",
+        "category": "unrelated",
+        "left": "How does a suspension bridge carry load through its main cables?",
+        "right": "Como as leguminosas fixam nitrogênio com bactérias nas raízes?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "suspension-bridge|nitrogen-fixation",
+        "note": ""
+      },
+      "similarity": 0.7727455942391952
+    },
+    {
+      "pair": {
+        "id": "unrelated-sourdough-error-correction-en",
+        "category": "unrelated",
+        "left": "What happens inside a sourdough starter during the first week?",
+        "right": "How do error correcting codes recover data from a failed drive?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "sourdough|error-correction",
+        "note": ""
+      },
+      "similarity": 0.7855476282296339
+    },
+    {
+      "pair": {
+        "id": "unrelated-sourdough-error-correction-pt",
+        "category": "unrelated",
+        "left": "O que acontece dentro de um fermento natural durante a primeira semana?",
+        "right": "Como os códigos corretores de erro recuperam dados de um disco que falhou?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "sourdough|error-correction",
+        "note": ""
+      },
+      "similarity": 0.8096706814275872
+    },
+    {
+      "pair": {
+        "id": "unrelated-sourdough-error-correction-en-pt",
+        "category": "unrelated",
+        "left": "What happens inside a sourdough starter during the first week?",
+        "right": "Como os códigos corretores de erro recuperam dados de um disco que falhou?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "sourdough|error-correction",
+        "note": ""
+      },
+      "similarity": 0.7702386887236081
+    },
+    {
+      "pair": {
+        "id": "unrelated-tidal-locking-arctic-tern-en",
+        "category": "unrelated",
+        "left": "Why is the Moon tidally locked to the Earth?",
+        "right": "How does the Arctic tern navigate on its yearly migration?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "tidal-locking|arctic-tern",
+        "note": ""
+      },
+      "similarity": 0.8062081111079631
+    },
+    {
+      "pair": {
+        "id": "unrelated-tidal-locking-arctic-tern-pt",
+        "category": "unrelated",
+        "left": "Por que a Lua está em rotação sincronizada com a Terra?",
+        "right": "Como a andorinha-do-ártico se orienta na migração anual?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "tidal-locking|arctic-tern",
+        "note": ""
+      },
+      "similarity": 0.8328213281776472
+    },
+    {
+      "pair": {
+        "id": "unrelated-tidal-locking-arctic-tern-en-pt",
+        "category": "unrelated",
+        "left": "Why is the Moon tidally locked to the Earth?",
+        "right": "Como a andorinha-do-ártico se orienta na migração anual?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "tidal-locking|arctic-tern",
+        "note": ""
+      },
+      "similarity": 0.795502613293012
+    },
+    {
+      "pair": {
+        "id": "unrelated-antibiotic-resistance-reverse-osmosis-en",
+        "category": "unrelated",
+        "left": "How does antibiotic resistance spread between bacteria in a hospital?",
+        "right": "Why does reverse osmosis need high pressure to desalinate water?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "antibiotic-resistance|reverse-osmosis",
+        "note": ""
+      },
+      "similarity": 0.8301145747816316
+    },
+    {
+      "pair": {
+        "id": "unrelated-antibiotic-resistance-reverse-osmosis-pt",
+        "category": "unrelated",
+        "left": "Como a resistência a antibióticos se espalha entre bactérias num hospital?",
+        "right": "Por que a osmose reversa precisa de alta pressão para dessalinizar água?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "antibiotic-resistance|reverse-osmosis",
+        "note": ""
+      },
+      "similarity": 0.8418069226377349
+    },
+    {
+      "pair": {
+        "id": "unrelated-antibiotic-resistance-reverse-osmosis-en-pt",
+        "category": "unrelated",
+        "left": "How does antibiotic resistance spread between bacteria in a hospital?",
+        "right": "Por que a osmose reversa precisa de alta pressão para dessalinizar água?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "antibiotic-resistance|reverse-osmosis",
+        "note": ""
+      },
+      "similarity": 0.788296858077474
+    },
+    {
+      "pair": {
+        "id": "unrelated-shipping-container-urban-heat-en",
+        "category": "unrelated",
+        "left": "How did the shipping container change port labour in the 1960s?",
+        "right": "Why are cities hotter than the countryside at night?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "shipping-container|urban-heat",
+        "note": ""
+      },
+      "similarity": 0.7748760921968322
+    },
+    {
+      "pair": {
+        "id": "unrelated-shipping-container-urban-heat-pt",
+        "category": "unrelated",
+        "left": "Como o contêiner mudou o trabalho portuário nos anos 1960?",
+        "right": "Por que as cidades são mais quentes que o campo à noite?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "shipping-container|urban-heat",
+        "note": ""
+      },
+      "similarity": 0.7982378087151639
+    },
+    {
+      "pair": {
+        "id": "unrelated-shipping-container-urban-heat-en-pt",
+        "category": "unrelated",
+        "left": "How did the shipping container change port labour in the 1960s?",
+        "right": "Por que as cidades são mais quentes que o campo à noite?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "shipping-container|urban-heat",
+        "note": ""
+      },
+      "similarity": 0.7393663734943647
+    },
+    {
+      "pair": {
+        "id": "unrelated-coral-bleaching-mycorrhizal-en",
+        "category": "unrelated",
+        "left": "At what temperature does coral start to bleach?",
+        "right": "How do mycorrhizal networks move nutrients between trees?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "coral-bleaching|mycorrhizal",
+        "note": ""
+      },
+      "similarity": 0.795960478604074
+    },
+    {
+      "pair": {
+        "id": "unrelated-coral-bleaching-mycorrhizal-pt",
+        "category": "unrelated",
+        "left": "A partir de que temperatura o coral começa a branquear?",
+        "right": "Como as redes micorrízicas movem nutrientes entre árvores?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "coral-bleaching|mycorrhizal",
+        "note": ""
+      },
+      "similarity": 0.8257003853387984
+    },
+    {
+      "pair": {
+        "id": "unrelated-coral-bleaching-mycorrhizal-en-pt",
+        "category": "unrelated",
+        "left": "At what temperature does coral start to bleach?",
+        "right": "Como as redes micorrízicas movem nutrientes entre árvores?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "coral-bleaching|mycorrhizal",
+        "note": ""
+      },
+      "similarity": 0.7720772569150081
+    },
+    {
+      "pair": {
+        "id": "unrelated-rent-control-concert-hall-en",
+        "category": "unrelated",
+        "left": "What does rent control do to the supply of rental housing?",
+        "right": "What makes a concert hall sound good for orchestral music?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "rent-control|concert-hall",
+        "note": ""
+      },
+      "similarity": 0.7494089140107073
+    },
+    {
+      "pair": {
+        "id": "unrelated-rent-control-concert-hall-pt",
+        "category": "unrelated",
+        "left": "O que o controle de aluguéis faz com a oferta de imóveis para locação?",
+        "right": "O que faz uma sala de concertos soar bem para música orquestral?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "rent-control|concert-hall",
+        "note": ""
+      },
+      "similarity": 0.8290357339921725
+    },
+    {
+      "pair": {
+        "id": "unrelated-rent-control-concert-hall-en-pt",
+        "category": "unrelated",
+        "left": "What does rent control do to the supply of rental housing?",
+        "right": "O que faz uma sala de concertos soar bem para música orquestral?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "rent-control|concert-hall",
+        "note": ""
+      },
+      "similarity": 0.7394219886191636
+    },
+    {
+      "pair": {
+        "id": "unrelated-nitrogen-fixation-lithium-brine-en",
+        "category": "unrelated",
+        "left": "How do legumes fix nitrogen with root bacteria?",
+        "right": "How is lithium extracted from salt flat brine?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "nitrogen-fixation|lithium-brine",
+        "note": ""
+      },
+      "similarity": 0.8405796929604141
+    },
+    {
+      "pair": {
+        "id": "unrelated-nitrogen-fixation-lithium-brine-pt",
+        "category": "unrelated",
+        "left": "Como as leguminosas fixam nitrogênio com bactérias nas raízes?",
+        "right": "Como o lítio é extraído da salmoura de salares?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "nitrogen-fixation|lithium-brine",
+        "note": ""
+      },
+      "similarity": 0.8221181096161937
+    },
+    {
+      "pair": {
+        "id": "unrelated-nitrogen-fixation-lithium-brine-en-pt",
+        "category": "unrelated",
+        "left": "How do legumes fix nitrogen with root bacteria?",
+        "right": "Como o lítio é extraído da salmoura de salares?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "nitrogen-fixation|lithium-brine",
+        "note": ""
+      },
+      "similarity": 0.787070800868517
+    },
+    {
+      "pair": {
+        "id": "unrelated-error-correction-printing-press-en",
+        "category": "unrelated",
+        "left": "How do error correcting codes recover data from a failed drive?",
+        "right": "How did the printing press change literacy in the fifteenth century?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "error-correction|printing-press",
+        "note": ""
+      },
+      "similarity": 0.7564207291712816
+    },
+    {
+      "pair": {
+        "id": "unrelated-error-correction-printing-press-pt",
+        "category": "unrelated",
+        "left": "Como os códigos corretores de erro recuperam dados de um disco que falhou?",
+        "right": "Como a imprensa mudou a alfabetização no século quinze?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "error-correction|printing-press",
+        "note": ""
+      },
+      "similarity": 0.7924686636930646
+    },
+    {
+      "pair": {
+        "id": "unrelated-error-correction-printing-press-en-pt",
+        "category": "unrelated",
+        "left": "How do error correcting codes recover data from a failed drive?",
+        "right": "Como a imprensa mudou a alfabetização no século quinze?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "error-correction|printing-press",
+        "note": ""
+      },
+      "similarity": 0.7239452126842065
+    },
+    {
+      "pair": {
+        "id": "unrelated-arctic-tern-circadian-plants-en",
+        "category": "unrelated",
+        "left": "How does the Arctic tern navigate on its yearly migration?",
+        "right": "How do plants keep circadian rhythm without a nervous system?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "arctic-tern|circadian-plants",
+        "note": ""
+      },
+      "similarity": 0.8118409809330502
+    },
+    {
+      "pair": {
+        "id": "unrelated-arctic-tern-circadian-plants-pt",
+        "category": "unrelated",
+        "left": "Como a andorinha-do-ártico se orienta na migração anual?",
+        "right": "Como as plantas mantêm ritmo circadiano sem sistema nervoso?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "arctic-tern|circadian-plants",
+        "note": ""
+      },
+      "similarity": 0.8389809813845345
+    },
+    {
+      "pair": {
+        "id": "unrelated-arctic-tern-circadian-plants-en-pt",
+        "category": "unrelated",
+        "left": "How does the Arctic tern navigate on its yearly migration?",
+        "right": "Como as plantas mantêm ritmo circadiano sem sistema nervoso?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "arctic-tern|circadian-plants",
+        "note": ""
+      },
+      "similarity": 0.7661284425790227
+    },
+    {
+      "pair": {
+        "id": "unrelated-reverse-osmosis-railway-gauge-en",
+        "category": "unrelated",
+        "left": "Why does reverse osmosis need high pressure to desalinate water?",
+        "right": "Why did railways standardise on a single track gauge?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "reverse-osmosis|railway-gauge",
+        "note": ""
+      },
+      "similarity": 0.7964803549789733
+    },
+    {
+      "pair": {
+        "id": "unrelated-reverse-osmosis-railway-gauge-pt",
+        "category": "unrelated",
+        "left": "Por que a osmose reversa precisa de alta pressão para dessalinizar água?",
+        "right": "Por que as ferrovias padronizaram uma única bitola?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "reverse-osmosis|railway-gauge",
+        "note": ""
+      },
+      "similarity": 0.7959321238876823
+    },
+    {
+      "pair": {
+        "id": "unrelated-reverse-osmosis-railway-gauge-en-pt",
+        "category": "unrelated",
+        "left": "Why does reverse osmosis need high pressure to desalinate water?",
+        "right": "Por que as ferrovias padronizaram uma única bitola?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "reverse-osmosis|railway-gauge",
+        "note": ""
+      },
+      "similarity": 0.7555363512808654
+    },
+    {
+      "pair": {
+        "id": "unrelated-urban-heat-peat-bog-en",
+        "category": "unrelated",
+        "left": "Why are cities hotter than the countryside at night?",
+        "right": "Why do peat bogs preserve human remains so well?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "urban-heat|peat-bog",
+        "note": ""
+      },
+      "similarity": 0.85745752023585
+    },
+    {
+      "pair": {
+        "id": "unrelated-urban-heat-peat-bog-pt",
+        "category": "unrelated",
+        "left": "Por que as cidades são mais quentes que o campo à noite?",
+        "right": "Por que os pântanos de turfa preservam tão bem restos humanos?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "urban-heat|peat-bog",
+        "note": ""
+      },
+      "similarity": 0.8455754092685452
+    },
+    {
+      "pair": {
+        "id": "unrelated-urban-heat-peat-bog-en-pt",
+        "category": "unrelated",
+        "left": "Why are cities hotter than the countryside at night?",
+        "right": "Por que os pântanos de turfa preservam tão bem restos humanos?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "urban-heat|peat-bog",
+        "note": ""
+      },
+      "similarity": 0.7903095373367661
+    },
+    {
+      "pair": {
+        "id": "unrelated-mycorrhizal-coffee-rust-en",
+        "category": "unrelated",
+        "left": "How do mycorrhizal networks move nutrients between trees?",
+        "right": "What causes coffee leaf rust to spread so quickly in wet seasons?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "mycorrhizal|coffee-rust",
+        "note": ""
+      },
+      "similarity": 0.8314016359249112
+    },
+    {
+      "pair": {
+        "id": "unrelated-mycorrhizal-coffee-rust-pt",
+        "category": "unrelated",
+        "left": "Como as redes micorrízicas movem nutrientes entre árvores?",
+        "right": "O que faz a ferrugem do cafeeiro se espalhar tão rápido na estação chuvosa?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "mycorrhizal|coffee-rust",
+        "note": ""
+      },
+      "similarity": 0.8424626717549982
+    },
+    {
+      "pair": {
+        "id": "unrelated-mycorrhizal-coffee-rust-en-pt",
+        "category": "unrelated",
+        "left": "How do mycorrhizal networks move nutrients between trees?",
+        "right": "O que faz a ferrugem do cafeeiro se espalhar tão rápido na estação chuvosa?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "mycorrhizal|coffee-rust",
+        "note": ""
+      },
+      "similarity": 0.7993328181540575
+    },
+    {
+      "pair": {
+        "id": "unrelated-concert-hall-suspension-bridge-en",
+        "category": "unrelated",
+        "left": "What makes a concert hall sound good for orchestral music?",
+        "right": "How does a suspension bridge carry load through its main cables?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "concert-hall|suspension-bridge",
+        "note": ""
+      },
+      "similarity": 0.7991110084747023
+    },
+    {
+      "pair": {
+        "id": "unrelated-concert-hall-suspension-bridge-pt",
+        "category": "unrelated",
+        "left": "O que faz uma sala de concertos soar bem para música orquestral?",
+        "right": "Como uma ponte pênsil transfere carga pelos cabos principais?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "concert-hall|suspension-bridge",
+        "note": ""
+      },
+      "similarity": 0.8019289886265274
+    },
+    {
+      "pair": {
+        "id": "unrelated-concert-hall-suspension-bridge-en-pt",
+        "category": "unrelated",
+        "left": "What makes a concert hall sound good for orchestral music?",
+        "right": "Como uma ponte pênsil transfere carga pelos cabos principais?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "concert-hall|suspension-bridge",
+        "note": ""
+      },
+      "similarity": 0.7486764597114464
+    },
+    {
+      "pair": {
+        "id": "unrelated-lithium-brine-sourdough-en",
+        "category": "unrelated",
+        "left": "How is lithium extracted from salt flat brine?",
+        "right": "What happens inside a sourdough starter during the first week?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "lithium-brine|sourdough",
+        "note": ""
+      },
+      "similarity": 0.7971336299249916
+    },
+    {
+      "pair": {
+        "id": "unrelated-lithium-brine-sourdough-pt",
+        "category": "unrelated",
+        "left": "Como o lítio é extraído da salmoura de salares?",
+        "right": "O que acontece dentro de um fermento natural durante a primeira semana?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "lithium-brine|sourdough",
+        "note": ""
+      },
+      "similarity": 0.8211188963934806
+    },
+    {
+      "pair": {
+        "id": "unrelated-lithium-brine-sourdough-en-pt",
+        "category": "unrelated",
+        "left": "How is lithium extracted from salt flat brine?",
+        "right": "O que acontece dentro de um fermento natural durante a primeira semana?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "lithium-brine|sourdough",
+        "note": ""
+      },
+      "similarity": 0.78441011751371
+    },
+    {
+      "pair": {
+        "id": "unrelated-printing-press-tidal-locking-en",
+        "category": "unrelated",
+        "left": "How did the printing press change literacy in the fifteenth century?",
+        "right": "Why is the Moon tidally locked to the Earth?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "printing-press|tidal-locking",
+        "note": ""
+      },
+      "similarity": 0.7662158866629688
+    },
+    {
+      "pair": {
+        "id": "unrelated-printing-press-tidal-locking-pt",
+        "category": "unrelated",
+        "left": "Como a imprensa mudou a alfabetização no século quinze?",
+        "right": "Por que a Lua está em rotação sincronizada com a Terra?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "printing-press|tidal-locking",
+        "note": ""
+      },
+      "similarity": 0.7786998279047206
+    },
+    {
+      "pair": {
+        "id": "unrelated-printing-press-tidal-locking-en-pt",
+        "category": "unrelated",
+        "left": "How did the printing press change literacy in the fifteenth century?",
+        "right": "Por que a Lua está em rotação sincronizada com a Terra?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "printing-press|tidal-locking",
+        "note": ""
+      },
+      "similarity": 0.7104739093096977
+    },
+    {
+      "pair": {
+        "id": "unrelated-circadian-plants-antibiotic-resistance-en",
+        "category": "unrelated",
+        "left": "How do plants keep circadian rhythm without a nervous system?",
+        "right": "How does antibiotic resistance spread between bacteria in a hospital?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "circadian-plants|antibiotic-resistance",
+        "note": ""
+      },
+      "similarity": 0.8256864648603177
+    },
+    {
+      "pair": {
+        "id": "unrelated-circadian-plants-antibiotic-resistance-pt",
+        "category": "unrelated",
+        "left": "Como as plantas mantêm ritmo circadiano sem sistema nervoso?",
+        "right": "Como a resistência a antibióticos se espalha entre bactérias num hospital?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "circadian-plants|antibiotic-resistance",
+        "note": ""
+      },
+      "similarity": 0.8189350974844171
+    },
+    {
+      "pair": {
+        "id": "unrelated-circadian-plants-antibiotic-resistance-en-pt",
+        "category": "unrelated",
+        "left": "How do plants keep circadian rhythm without a nervous system?",
+        "right": "Como a resistência a antibióticos se espalha entre bactérias num hospital?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "circadian-plants|antibiotic-resistance",
+        "note": ""
+      },
+      "similarity": 0.785820180480669
+    },
+    {
+      "pair": {
+        "id": "unrelated-railway-gauge-shipping-container-en",
+        "category": "unrelated",
+        "left": "Why did railways standardise on a single track gauge?",
+        "right": "How did the shipping container change port labour in the 1960s?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "railway-gauge|shipping-container",
+        "note": ""
+      },
+      "similarity": 0.8071437283578513
+    },
+    {
+      "pair": {
+        "id": "unrelated-railway-gauge-shipping-container-pt",
+        "category": "unrelated",
+        "left": "Por que as ferrovias padronizaram uma única bitola?",
+        "right": "Como o contêiner mudou o trabalho portuário nos anos 1960?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "railway-gauge|shipping-container",
+        "note": ""
+      },
+      "similarity": 0.8363019420489413
+    },
+    {
+      "pair": {
+        "id": "unrelated-railway-gauge-shipping-container-en-pt",
+        "category": "unrelated",
+        "left": "Why did railways standardise on a single track gauge?",
+        "right": "Como o contêiner mudou o trabalho portuário nos anos 1960?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "railway-gauge|shipping-container",
+        "note": ""
+      },
+      "similarity": 0.7790794389921956
+    },
+    {
+      "pair": {
+        "id": "unrelated-peat-bog-coral-bleaching-en",
+        "category": "unrelated",
+        "left": "Why do peat bogs preserve human remains so well?",
+        "right": "At what temperature does coral start to bleach?",
+        "left_lang": "en",
+        "right_lang": "en",
+        "topic": "peat-bog|coral-bleaching",
+        "note": ""
+      },
+      "similarity": 0.7909262885057577
+    },
+    {
+      "pair": {
+        "id": "unrelated-peat-bog-coral-bleaching-pt",
+        "category": "unrelated",
+        "left": "Por que os pântanos de turfa preservam tão bem restos humanos?",
+        "right": "A partir de que temperatura o coral começa a branquear?",
+        "left_lang": "pt",
+        "right_lang": "pt",
+        "topic": "peat-bog|coral-bleaching",
+        "note": ""
+      },
+      "similarity": 0.8051542517617624
+    },
+    {
+      "pair": {
+        "id": "unrelated-peat-bog-coral-bleaching-en-pt",
+        "category": "unrelated",
+        "left": "Why do peat bogs preserve human remains so well?",
+        "right": "A partir de que temperatura o coral começa a branquear?",
+        "left_lang": "en",
+        "right_lang": "pt",
+        "topic": "peat-bog|coral-bleaching",
+        "note": ""
+      },
+      "similarity": 0.7778617792021714
+    }
+  ]
+}
