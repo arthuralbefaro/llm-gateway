@@ -124,7 +124,10 @@ def load_pairs(path: Path | None = None) -> list[Pair]:
 
 def write_pairs(pairs: list[Pair], path: Path) -> None:
     lines = [json.dumps(asdict(pair), ensure_ascii=False) for pair in pairs]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # newline pinned so the provenance digest is the same bytes on every
+    # platform, windows text mode would translate to crlf and ci would then
+    # refuse its own dataset
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
 
 def dataset_digest(path: Path | None = None) -> str:
