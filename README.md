@@ -231,3 +231,7 @@ record: `docs/load/baseline.md`, `docs/load/worker-pool.md`,
   it is origin.
 - **Tail sampling, per-key analytics, dashboard depth** — listed with reasons
   in the week 4 report.
+
+## License
+
+[MIT](LICENSE)
