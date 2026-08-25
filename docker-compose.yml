@@ -5,6 +5,8 @@
 services:
   postgres:
     image: pgvector/pgvector:pg17
+    # development credentials for this local stack only, matching .env.example,
+    # anything beyond a laptop brings its own secrets
     environment:
       POSTGRES_USER: gateway
       POSTGRES_PASSWORD: gateway

@@ -217,20 +217,37 @@ Load and observability reports, with environment and voided runs kept in the
 record: `docs/load/baseline.md`, `docs/load/worker-pool.md`,
 `docs/load/read-path-after-opt-in.md`, `docs/reports/week-4-observability.md`.
 
-## Not covered
+## Known and accepted limitations
 
+Understood, measured where possible, and not scheduled to change.
+
+- **All traffic is synthetic.** Every request in every measurement was
+  generated. The hit distribution, the frequency of near-miss prompts and the
+  value of the semantic tier in practice are unknown — what is missing is not
+  volume, it is origin.
 - **HNSW under pressure.** `CacheEntry` never exceeded a few hundred rows;
   nothing here says anything about the index at scale.
 - **Postgres pool limits.** Never the constraint at the measured rates, so
   never characterised.
 - **Multi-instance breaker.** Breaker state is in-memory and per-process; two
   gateway instances learn about a dead provider independently.
-- **Real traffic.** Every request in every measurement was generated. The hit
-  distribution, the frequency of near-miss prompts, and the value of the
-  semantic tier in practice are all unknown — what is missing is not volume,
-  it is origin.
-- **Tail sampling, per-key analytics, dashboard depth** — listed with reasons
-  in the week 4 report.
+- **Dashboard depth.** Four panels at the simplest depth that works, a
+  deliberate cut recorded in week 4.
+
+## Debt somebody should pay
+
+Improvements with a known shape that were recorded instead of built.
+
+- **A scope on `ApiKey` for the analytics API.** One shared secret cannot be
+  revoked per reader or rotated without coordinating everyone; the right shape
+  is recorded in ADR-adjacent notes since week 4.
+- **The negation filter on the opt-in path.** Measured: raises opt-in precision
+  from 0.444 to 0.571 at zero recall cost, within limits ADR 0010 states. It
+  refines the opt-in tier and does not rescue the signal.
+- **Tail sampling.** Head sampling cannot keep the slow requests specifically,
+  which is what a production sampler should do; needs a collector.
+- **Per-key analytics**, deliberately absent from metrics for cardinality
+  reasons and not yet built in the SQL API either.
 
 ## License
 

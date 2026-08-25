@@ -70,16 +70,25 @@ export function LineChart({
         ))}
 
         {series.map((line) => (
-          <polyline
-            key={line.label}
-            fill="none"
-            stroke={line.colour}
-            strokeWidth={2}
-            strokeDasharray={line.dashed ? '5 4' : undefined}
-            points={line.values
-              .map((value, index) => `${x(index)},${y(value)}`)
-              .join(' ')}
-          />
+          <g key={line.label}>
+            <polyline
+              fill="none"
+              stroke={line.colour}
+              strokeWidth={2}
+              strokeDasharray={line.dashed ? '5 4' : undefined}
+              points={line.values
+                .map((value, index) => `${x(index)},${y(value)}`)
+                .join(' ')}
+            />
+            {!line.dashed && line.values.length > 0 && (
+              <circle
+                cx={x(line.values.length - 1)}
+                cy={y(line.values[line.values.length - 1])}
+                r={3}
+                fill={line.colour}
+              />
+            )}
+          </g>
         ))}
 
         {labels.length > 0 && (
@@ -103,7 +112,8 @@ export function LineChart({
         {series.map((line) => (
           <span key={line.label}>
             <i style={{ background: line.colour }} data-dashed={line.dashed} />
-            {line.label}
+            {line.label}{' '}
+            <b>{format(line.values[line.values.length - 1])}</b>
           </span>
         ))}
       </figcaption>

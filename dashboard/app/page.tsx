@@ -7,22 +7,61 @@ export const dynamic = 'force-dynamic';
 
 const BUCKET = 'minute';
 
+// data colours match the evaluation suite's charts, the chrome stays ink
 const COLOURS = {
-  total: '#6b7280',
-  exact: '#2563eb',
-  semantic: '#d97706',
-  confirmed: '#059669',
-  estimated: '#a855f7',
-  p50: '#2563eb',
-  p95: '#d97706',
-  p99: '#dc2626',
+  total: '#b6b1a7',
+  exact: '#2b6ea3',
+  semantic: '#c77d1f',
+  confirmed: '#1b7837',
+  estimated: '#8256a8',
+  p50: '#2b6ea3',
+  p95: '#c77d1f',
+  p99: '#b2182b',
 };
 
-function Empty({ what, error }: { what: string; error?: string }) {
+function EmptyState({ what }: { what: string }) {
+  return <p className="empty">No {what} recorded in this window.</p>;
+}
+
+// a fault must not look like a quiet afternoon: the panel is intact, the data
+// source is not, and the interface has to say which one happened
+function FaultState({ error }: { error: string }) {
   return (
-    <p className="empty">
-      {error ? `could not load ${what}: ${error}` : `no ${what} in this window`}
-    </p>
+    <div className="fault">
+      <div className="fault-head">
+        <span className="fault-dot" />
+        analytics unreachable
+      </div>
+      <div className="fault-body">
+        The gateway did not answer this panel&apos;s query. The panel is
+        intact; the data source is not.
+        <code>{error}</code>
+      </div>
+    </div>
+  );
+}
+
+function PanelState({ what, error }: { what: string; error?: string }) {
+  return error ? <FaultState error={error} /> : <EmptyState what={what} />;
+}
+
+function PanelHead({
+  no,
+  title,
+  children,
+}: {
+  no: string;
+  title: string;
+  children?: React.ReactNode;
+}) {
+  return (
+    <div className="panel-head">
+      <div className="panel-title">
+        <span className="panel-no">{no} /</span>
+        <h2>{title}</h2>
+      </div>
+      {children}
+    </div>
   );
 }
 
@@ -67,7 +106,9 @@ export default async function Page() {
       </header>
 
       <section>
-        <h2>Cost over time</h2>
+        <PanelHead no="1" title="Cost over time">
+          <CostTotals data={costs} />
+        </PanelHead>
         <p className="note">
           Estimated cost is drawn dashed. It comes from a stream that failed
           after emitting text, where the provider billed for output it never
@@ -77,7 +118,9 @@ export default async function Page() {
       </section>
 
       <section>
-        <h2>Cache hit rate</h2>
+        <PanelHead no="2" title="Cache hit rate">
+          <HitTotals data={hits} />
+        </PanelHead>
         <p className="note">
           Exact and semantic are separate lines because they are not the same
           product. The latency panel below is the reason: a semantic hit&apos;s
@@ -97,7 +140,7 @@ export default async function Page() {
       </section>
 
       <section>
-        <h2>Latency by cache outcome</h2>
+        <PanelHead no="3" title="Latency by cache outcome" />
         <p className="note">
           Never aggregated across the cache outcome. A percentile over both
           describes no real population: the two are distributions two orders of
@@ -107,7 +150,7 @@ export default async function Page() {
       </section>
 
       <section>
-        <h2>Provider health</h2>
+        <PanelHead no="4" title="Provider health" />
         <p className="note">
           Failure rate is counted over attempts rather than requests, so a
           provider failing behind a working fallback is still visible.
@@ -118,21 +161,74 @@ export default async function Page() {
   );
 }
 
+function sumBy<T>(rows: T[], pick: (row: T) => number): number {
+  return rows.reduce((total, row) => total + pick(row), 0);
+}
+
+function CostTotals({ data }: { data: Awaited<ReturnType<typeof cost>> }) {
+  if (data.rows.length === 0) {
+    return null;
+  }
+  const confirmed = sumBy(data.rows, (row) => row.cost_confirmed);
+  const estimated = sumBy(data.rows, (row) => row.cost_estimated);
+  return (
+    <dl className="headline">
+      <div>
+        <dt>confirmed</dt>
+        <dd>{usd(confirmed)}</dd>
+      </div>
+      <div>
+        <dt>estimated</dt>
+        <dd className="estimated">{usd(estimated)}</dd>
+      </div>
+    </dl>
+  );
+}
+
+function HitTotals({ data }: { data: Awaited<ReturnType<typeof hitRate>> }) {
+  const requests = sumBy(data.rows, (row) => row.requests);
+  if (requests === 0) {
+    return null;
+  }
+  // window aggregates over the same rows the chart draws, nothing extra fetched
+  const rate = sumBy(data.rows, (row) => row.hits) / requests;
+  const exact = sumBy(data.rows, (row) => row.exact_hits) / requests;
+  const semantic = sumBy(data.rows, (row) => row.semantic_hits) / requests;
+  return (
+    <dl className="headline">
+      <div>
+        <dt>window</dt>
+        <dd>{percent(rate)}</dd>
+      </div>
+      <div>
+        <dt>exact</dt>
+        <dd>{percent(exact)}</dd>
+      </div>
+      <div>
+        <dt>semantic</dt>
+        <dd>{percent(semantic)}</dd>
+      </div>
+    </dl>
+  );
+}
+
 function CostChart({ data }: { data: Awaited<ReturnType<typeof cost>> }) {
   if (data.rows.length === 0) {
-    return <Empty what="cost" error={data.error} />;
+    return <PanelState what="cost" error={data.error} />;
   }
 
   const buckets = [...new Set(data.rows.map((row) => row.bucket))].sort();
   const confirmed = buckets.map((bucket) =>
-    data.rows
-      .filter((row) => row.bucket === bucket)
-      .reduce((total, row) => total + row.cost_confirmed, 0),
+    sumBy(
+      data.rows.filter((row) => row.bucket === bucket),
+      (row) => row.cost_confirmed,
+    ),
   );
   const estimated = buckets.map((bucket) =>
-    data.rows
-      .filter((row) => row.bucket === bucket)
-      .reduce((total, row) => total + row.cost_estimated, 0),
+    sumBy(
+      data.rows.filter((row) => row.bucket === bucket),
+      (row) => row.cost_estimated,
+    ),
   );
 
   const series: Series[] = [
@@ -146,27 +242,13 @@ function CostChart({ data }: { data: Awaited<ReturnType<typeof cost>> }) {
   ];
 
   return (
-    <>
-      <LineChart series={series} labels={buckets.map(shortTime)} format={usd} />
-      <dl className="totals">
-        <div>
-          <dt>confirmed</dt>
-          <dd>{usd(confirmed.reduce((a, b) => a + b, 0))}</dd>
-        </div>
-        <div>
-          <dt>estimated</dt>
-          <dd className="estimated">
-            {usd(estimated.reduce((a, b) => a + b, 0))}
-          </dd>
-        </div>
-      </dl>
-    </>
+    <LineChart series={series} labels={buckets.map(shortTime)} format={usd} />
   );
 }
 
 function HitRateChart({ data }: { data: Awaited<ReturnType<typeof hitRate>> }) {
   if (data.rows.length === 0) {
-    return <Empty what="cache activity" error={data.error} />;
+    return <PanelState what="cache activity" error={data.error} />;
   }
 
   const rows = [...data.rows].sort((a, b) => a.bucket.localeCompare(b.bucket));
@@ -199,7 +281,7 @@ function HitRateChart({ data }: { data: Awaited<ReturnType<typeof hitRate>> }) {
 
 function LatencyTable({ data }: { data: Fetched<LatencyRow> }) {
   if (data.rows.length === 0) {
-    return <Empty what="latency" error={data.error} />;
+    return <PanelState what="latency" error={data.error} />;
   }
 
   return (
@@ -252,7 +334,7 @@ function ProviderTable({
 
   if (names.length === 0) {
     return (
-      <Empty
+      <PanelState
         what="provider activity"
         error={breakerData.error ?? failureData.error}
       />
