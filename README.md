@@ -1,5 +1,7 @@
 # llm-gateway
 
+[![ci](https://github.com/arthuralbefaro/llm-gateway/actions/workflows/ci.yml/badge.svg)](https://github.com/arthuralbefaro/llm-gateway/actions/workflows/ci.yml)
+
 An LLM gateway with a measured semantic cache. One endpoint routes chat
 completions across providers with retry, fallback and a circuit breaker, caches
 answers exactly and — only when a caller opts in — by embedding similarity,

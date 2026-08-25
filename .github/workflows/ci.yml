@@ -1,0 +1,107 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  node:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - run: corepack enable
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: pnpm-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: pnpm-${{ runner.os }}-
+
+      - run: pnpm install --frozen-lockfile
+
+      # the generated client is gitignored, nothing compiles without it
+      - run: pnpm prisma generate
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+
+      # lint without --fix, a fix applied to a throwaway checkout is a pass
+      # that hides a failure
+      - run: pnpm lint:check
+
+      - run: pnpm build
+
+      # the guard that keeps generated migrations from dropping the hnsw index
+      # (adr 0003) runs inside pnpm test too, but it protects the semantic
+      # cache's viability and its execution has to be visible, not inferred
+      - name: migration guard, hnsw index protection
+        run: npx jest migration-guard --verbose
+
+      # no services on purpose: the suite stubs infrastructure and injects a
+      # test embedding worker, so a database or redis here would only prove
+      # the runner has docker
+      - run: pnpm test
+
+  python:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: evals
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: evals/uv.lock
+
+      - run: uv sync --frozen
+
+      - run: uv run ruff check .
+
+      - run: uv run ruff format --check .
+
+      - run: uv run pytest -q
+
+  # the stack of week 6 lives or dies by these images building, and a
+  # dockerfile that only breaks on somebody's laptop is a silent failure.
+  # the model bake downloads about 130 mb from huggingface per uncached build,
+  # which the layer cache absorbs on repeat runs
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: gateway image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: runtime
+          push: false
+          cache-from: type=gha,scope=gateway
+          cache-to: type=gha,scope=gateway,mode=max
+
+      - name: migrate stage
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: build
+          push: false
+          cache-from: type=gha,scope=gateway
+          cache-to: type=gha,scope=gateway,mode=max
+
+      - name: dashboard image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: dashboard/Dockerfile
+          push: false
+          cache-from: type=gha,scope=dashboard
+          cache-to: type=gha,scope=dashboard,mode=max
