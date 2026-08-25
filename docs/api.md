@@ -78,6 +78,33 @@ they bound what the tier can miss, not how often real traffic triggers it.
   the reason a high number is not reassurance.**
 - Streaming responses carry the same fields on the final chunk.
 
+## Analytics
+
+Six read-only endpoints over the request history, behind a bearer token
+separate from the gateway keys (`ANALYTICS_TOKEN`). With the token unset they
+answer 401 — the guard fails closed.
+
+```
+GET /v1/analytics/cost
+GET /v1/analytics/cache-hit-rate
+GET /v1/analytics/latency
+GET /v1/analytics/provider-failures
+GET /v1/analytics/fallbacks
+GET /v1/analytics/savings
+```
+
+All accept `from` and `to` (ISO 8601, default the last 24 hours) and `bucket`
+(`minute`, `hour`, `day`, default `hour`). Notes that matter when reading them:
+
+- `latency` and `cache-hit-rate` split exact from semantic and never aggregate
+  across cache outcome. The reason is measured: a semantic hit's p99 sits at
+  93% of a miss's, so a combined hit rate suggests a speed it does not deliver.
+- `savings` returns an interval, not a point estimate, and carries its
+  methodology in the response body. Estimated cost is always distinct from
+  confirmed cost.
+- Rows recorded before the `cacheKind` column existed are reported as
+  unclassified rather than guessed.
+
 ## Errors
 
 | Status | Meaning |

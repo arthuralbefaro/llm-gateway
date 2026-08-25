@@ -119,6 +119,20 @@ execution provider and optimisation level. The check is cheap — encode a handf
 of texts in both, compare. Verify parity before building on it, not after
 publishing.
 
+## The guard refused once, and was right to
+
+The results file carries a sha256 of the dataset it scored, and `load_results`
+refuses a mismatch. In week 6 CI refused its own committed dataset: Windows
+text mode had written `pairs.jsonl` with CRLF, the recorded digest was of those
+bytes, and the LF checkout on the runner no longer matched.
+
+The check was correct. The bug was in the thing it guarded — a
+platform-dependent digest — and the fix was pinning the writer to LF and
+rescoring, not loosening the comparison. **When a verification fails, the first
+question is whether it is right, not how to make it pass.** Weakening the guard
+would have kept every future digest mismatch invisible, which is the exact
+failure the contract exists to prevent.
+
 ## Consequences
 
 - The suite needs Node. `uv sync` alone does not reproduce the numbers.
